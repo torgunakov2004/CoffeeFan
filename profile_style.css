@@ -1,0 +1,179 @@
+/* profile_style.css */
+body {
+    background-color: #14110E; /* Уже есть в основном style.css, но можно для явности */
+    color: #FFFFFF;
+    font-family: 'Urbanist', Arial, sans-serif; /* Уже есть в основном style.css */
+}
+
+.profile-page-main {
+    padding-top: 30px; /* Отступ от хедера */
+    padding-bottom: 50px;
+}
+
+.profile-container {
+    max-width: 900px; /* Ограничиваем ширину контейнера профиля */
+    margin: 0 auto;
+    background-color: #1C1814; /* Фон для основной области профиля */
+    padding: 30px 40px;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.profile-page-title {
+    font-family: 'Righteous', cursive;
+    font-size: 32px;
+    color: #C99E71;
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #444;
+}
+
+.profile-message {
+    padding: 15px;
+    margin-bottom: 25px;
+    border-radius: 8px;
+    font-size: 15px;
+    text-align: center;
+    border-width: 1px;
+    border-style: solid;
+}
+.profile-message.success {
+    background-color: rgba(92, 184, 92, 0.15);
+    color: #5cb85c;
+    border-color: #5cb85c;
+}
+.profile-message.error {
+    background-color: rgba(217, 83, 79, 0.15);
+    color: #d9534f;
+    border-color: #d9534f;
+}
+
+.profile-sections-wrapper {
+    display: flex;
+    flex-direction: column; /* Разделы один под другим по умолчанию */
+    gap: 40px; /* Расстояние между секциями */
+}
+
+.profile-section {
+    background-color: #181512; /* Чуть другой фон для секций */
+    padding: 25px 30px;
+    border-radius: 10px;
+    border: 1px solid #333;
+}
+
+.profile-section-title {
+    font-family: 'Urbanist', sans-serif;
+    font-size: 22px;
+    color: #C99E71;
+    margin-bottom: 25px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #4a4a4a;
+}
+
+.profile-form .form-group {
+    margin-bottom: 20px;
+}
+
+.profile-form label {
+    display: block;
+    font-size: 14px;
+    color: #ccc;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.profile-form input[type="text"],
+.profile-form input[type="email"],
+.profile-form input[type="password"],
+.profile-form input[type="file"].file-input {
+    width: 100%;
+    padding: 10px 14px;
+    background-color: #14110E;
+    border: 1px solid #444;
+    border-radius: 6px;
+    color: #FFFFFF;
+    font-size: 15px;
+    font-family: 'Urbanist', sans-serif;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.profile-form input[type="text"]:focus,
+.profile-form input[type="email"]:focus,
+.profile-form input[type="password"]:focus,
+.profile-form input[type="file"].file-input:focus {
+    border-color: #C99E71;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(201, 158, 113, 0.2);
+}
+
+.profile-form .readonly-input {
+    background-color: #2a2623; /* Фон для нередактируемых полей */
+    color: #aaa;
+    cursor: not-allowed;
+}
+
+.avatar-group .current-avatar-container {
+    margin-bottom: 10px;
+}
+.avatar-group .current-avatar-img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%; /* Круглый аватар */
+    object-fit: cover;
+    border: 3px solid #444;
+}
+.profile-form input[type="file"].file-input {
+    padding: 8px 12px; /* Чуть меньше padding для input file */
+}
+
+.profile-submit-btn {
+    /* Использует стили .btn-primary из основного style.css */
+    padding: 12px 25px;
+    font-size: 16px;
+    margin-top: 10px; /* Небольшой отступ для кнопки */
+    width: auto; /* Чтобы кнопка была по ширине текста */
+}
+
+/* Адаптивность для профиля */
+@media (min-width: 769px) { /* На десктопах секции в ряд */
+    .profile-sections-wrapper {
+        flex-direction: row;
+        align-items: flex-start; /* Выравнивание по верху, если секции разной высоты */
+    }
+    .profile-section {
+        flex: 1; /* Равномерно делят пространство */
+    }
+}
+
+@media (max-width: 768px) {
+    .profile-container {
+        padding: 20px;
+    }
+    .profile-page-title {
+        font-size: 28px;
+        margin-bottom: 25px;
+    }
+    .profile-section {
+        padding: 20px;
+    }
+    .profile-section-title {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-container {
+        padding: 15px;
+    }
+    .profile-page-title {
+        font-size: 24px;
+    }
+    .profile-form input[type="text"],
+    .profile-form input[type="email"],
+    .profile-form input[type="password"],
+    .profile-form input[type="file"].file-input,
+    .profile-submit-btn {
+        font-size: 14px;
+    }
+}
