@@ -1,0 +1,233 @@
+/* profile/support_chat_style.css */
+
+.support-chat-page .profile-page-main-v2 { /* Убираем padding, чтобы контейнер чата занял больше места */
+    padding: 0; 
+}
+
+.support-chat-container {
+    width: 100%;
+    max-width: 700px; /* Ширина чата */
+    height: calc(100vh - 140px); /* Примерная высота: вся высота экрана минус хедер и футер */
+    background-color: #1c1814; /* Темный фон для чата */
+    border-radius: 10px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid #2a2520;
+}
+
+.chat-header {
+    background-color: #221e1a; /* Чуть светлее основного фона чата */
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #2a2520;
+}
+
+.support-avatar-chat {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    margin-right: 15px;
+    object-fit: cover;
+    border: 2px solid #C99E71;
+}
+
+.support-info .support-name {
+    display: block;
+    font-weight: 600;
+    color: #e0e0e0;
+    font-size: 1.1em;
+}
+
+.support-info .support-status {
+    font-size: 0.85em;
+    color: #888;
+}
+.support-info .support-status.online {
+    color: #65c765;
+}
+.support-info .support-status.online::before {
+    content: '●';
+    margin-right: 5px;
+    font-size: 0.9em;
+}
+
+.chat-messages {
+    flex-grow: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    scrollbar-width: thin;
+    scrollbar-color: #444 #2a2520;
+}
+.chat-messages::-webkit-scrollbar { width: 6px; }
+.chat-messages::-webkit-scrollbar-track { background: #2a2520; border-radius: 3px; }
+.chat-messages::-webkit-scrollbar-thumb { background-color: #444; border-radius: 3px; }
+
+
+.message {
+    display: flex;
+    align-items: flex-end; /* Аватар и текст сообщения выравниваются по низу */
+    max-width: 80%; /* Максимальная ширина сообщения */
+    gap: 10px;
+}
+.message-avatar {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    object-fit: cover;
+    align-self: flex-end; /* Для выравнивания по низу, если тексты разной высоты */
+}
+
+.message-content {
+    padding: 10px 15px;
+    border-radius: 18px;
+    line-height: 1.5;
+    font-size: 0.95em;
+    position: relative;
+}
+.message-content p {
+    margin: 0 0 5px 0;
+    word-wrap: break-word;
+}
+.message-time {
+    display: block;
+    font-size: 0.75em;
+    color: #777;
+    text-align: right;
+    margin-top: 3px;
+}
+
+.message.user {
+    align-self: flex-end; /* Сообщения пользователя справа */
+    flex-direction: row-reverse; /* Аватар справа от текста */
+}
+.message.user .message-content {
+    background-color: #C99E71;
+    color: #14110E;
+    border-bottom-right-radius: 5px; /* Хвостик сообщения */
+}
+.message.user .message-time {
+    color: #4a3a2a;
+}
+
+
+.message.support {
+    align-self: flex-start; /* Сообщения поддержки слева */
+}
+.message.support .message-content {
+    background-color: #2a2520;
+    color: #d0d0d0;
+    border-bottom-left-radius: 5px; /* Хвостик сообщения */
+}
+.message.support .message-time {
+    color: #666;
+}
+
+
+.chat-input-area {
+    display: flex;
+    align-items: flex-end; /* Выравнивание textarea и кнопки по низу */
+    padding: 15px 20px;
+    border-top: 1px solid #2a2520;
+    background-color: #221e1a;
+}
+
+.chat-input-area textarea {
+    flex-grow: 1;
+    padding: 10px 15px;
+    border: 1px solid #3a332d;
+    border-radius: 20px;
+    background-color: #14110E;
+    color: #e0e0e0;
+    font-size: 1em;
+    resize: none; /* Запрещаем ручное изменение размера */
+    min-height: 42px; /* Начальная высота для одной строки */
+    max-height: 120px; /* Максимальная высота, потом скролл */
+    overflow-y: auto;
+    line-height: 1.4;
+    margin-right: 10px;
+    scrollbar-width: thin;
+    scrollbar-color: #444 #14110E;
+}
+.chat-input-area textarea::-webkit-scrollbar { width: 5px; }
+.chat-input-area textarea::-webkit-scrollbar-thumb { background-color: #444; border-radius: 3px; }
+
+
+.chat-input-area textarea:focus {
+    outline: none;
+    border-color: #C99E71;
+    box-shadow: 0 0 0 2px rgba(201, 158, 113, 0.2);
+}
+
+.chat-input-area button {
+    background-color: #C99E71;
+    color: #14110E;
+    border: none;
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    flex-shrink: 0; /* Чтобы кнопка не сжималась */
+}
+.chat-input-area button:hover {
+    background-color: #bd864b;
+}
+.chat-input-area button .material-icons-outlined {
+    font-size: 24px;
+}
+
+.chat-contact-info {
+    background-color: #1a1714;
+    padding: 12px 20px;
+    border-top: 1px solid #2a2520;
+    font-size: 0.85em;
+    color: #888;
+    text-align: center;
+}
+.chat-contact-info p {
+    margin: 5px 0;
+}
+.chat-contact-info a {
+    color: #C99E71;
+    text-decoration: none;
+}
+.chat-contact-info a:hover {
+    text-decoration: underline;
+}
+.chat-contact-info i {
+    margin-right: 5px;
+    color: #C99E71;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .support-chat-container {
+        margin: 0 10px 10px 10px;
+        height: calc(100vh - 120px); /* Меньше отступы */
+        border-radius: 0; /* На мобильных чат может быть на весь экран без скруглений */
+        border-left: none;
+        border-right: none;
+    }
+     .chat-header { padding: 12px 15px; }
+     .support-avatar-chat { width: 40px; height: 40px; margin-right: 10px;}
+     .support-info .support-name { font-size: 1em; }
+     .chat-messages { padding: 15px; }
+     .message-avatar { width: 30px; height: 30px; }
+     .message-content { padding: 8px 12px; font-size: 0.9em; }
+     .chat-input-area { padding: 10px 15px; }
+     .chat-input-area textarea { padding: 8px 12px; min-height: 40px; }
+     .chat-input-area button { width: 40px; height: 40px; }
+     .chat-contact-info { font-size: 0.8em; padding: 10px 15px;}
+}
+@media (max-width: 480px) {
+     .message { max-width: 90%; }
+}

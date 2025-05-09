@@ -10,7 +10,6 @@ body {
     display: flex;
     justify-content: center;
     align-items: flex-start; /* Выравнивание карточки по верху, если она не на всю высоту */
-    min-height: calc(100vh - 150px); /* Примерная высота минус хедер и футер */
 }
 
 .profile-card-container {

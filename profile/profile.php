@@ -276,7 +276,7 @@ if (isset($_SESSION['user']['id'])) { // Проверка, что user суще�
                                 <li class="menu-divider"></li>
                                 <li><a class="menu-item" href="profile.php"><i class="icon-user"></i>Мой профиль</a></li>
                                 <li><a class="menu-item" href="orders.php"><i class="icon-orders"></i>Мои заказы</a></li>
-                                <li><a class="menu-item" href="favorites.php"><i class="icon-heart"></i>Избранное</a></li>
+                                <li><a class="menu-item" href="support.php"><i class="icon-heart"></i>Поддержка</a></li>
                                 <?php if (isset($_SESSION['user']['is_admin']) && $_SESSION['user']['is_admin']): ?>
                                     <li class="menu-divider"></li>
                                     <li><a class="menu-item admin" href="../admin/admin_dashboard.php"><i class="icon-admin"></i>Админ-панель</a></li>

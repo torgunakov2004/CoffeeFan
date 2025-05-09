@@ -105,9 +105,7 @@ function translateOrderStatus($status) {
                         <li class="nav-main__item"><a class="nav-main__link" href="../Рецепты/index.php">Рецепты</a></li>
                         <li class="nav-main__item"><a class="nav-main__link" href="../Акции/index.php">Акции</a></li>
                     </ul>
-                    <a href="../index.php">
                         <img class="header__logo" src="../img/logo.svg" alt="CoffeeeFan Logo">
-                    </a>
                     <ul class="nav-main__list">
                         <li class="nav-main__item"><a class="nav-main__link" href="../О кофе/index.php">О кофе</a></li>
                         <li class="nav-main__item"><a class="nav-main__link" href="../Новости/index.php">Новости</a></li>
@@ -159,7 +157,7 @@ function translateOrderStatus($status) {
                                 <li class="menu-divider"></li>
                                 <li><a class="menu-item" href="profile.php"><i class="icon-user"></i>Мой профиль</a></li>
                                 <li><a class="menu-item" href="orders.php"><i class="icon-orders"></i>Мои заказы</a></li>
-                                <li><a class="menu-item" href="favorites.php"><i class="icon-heart"></i>Избранное</a></li>
+                                <li><a class="menu-item" href="support.php"><i class="icon-heart"></i>Поддержка</a></li>
                                 <?php if (isset($_SESSION['user']['is_admin']) && $_SESSION['user']['is_admin']): ?>
                                     <li class="menu-divider"></li>
                                     <li><a class="menu-item admin" href="../admin/admin_dashboard.php"><i class="icon-admin"></i>Админ-панель</a></li>
