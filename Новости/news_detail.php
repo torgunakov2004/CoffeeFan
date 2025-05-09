@@ -177,36 +177,85 @@ if (isset($_GET['from']) && $_GET['from'] === 'main') {
                     <button class="header-action__cart-1 material-icons-outlined <?php echo $has_items_in_cart ? 'active' : ''; ?>">shopping_cart</button>
                 </a>
                 <nav class="profile">
-                    <nav class="account">
-                        <img src="<?php echo (isset($_SESSION['user']['avatar']) && !empty($_SESSION['user']['avatar'])) ? htmlspecialchars($_SESSION['user']['avatar']) : '../img/icons8.png'; ?>" class="profile-avatar">
-                    </nav>
-                    <?php if (!isset($_SESSION['user'])): ?>
-                        <ul class="submenu">
-                            <li><a class="log" href="../auth/authorization.php">Вход</a></li>
-                            <li><a class="log" href="../auth/register.php">Регистрация</a></li>
-                        </ul>
-                    <?php else: ?>
-                        <ul class="submenu">
-                            <li class="user-info">
-                                <div class="user-avatar"> <img src="<?php echo $_SESSION['user']['avatar'] ?? '../img/default-avatar.jpg'; ?>" alt="Аватар"> </div>
-                                <div class="user-details">
-                                    <span class="user-name"><?= htmlspecialchars($_SESSION["user"]['first_name'] ?? ($_SESSION["user"]['name'] ?? 'Пользователь')) ?></span>
-                                    <span class="user-email"><?= htmlspecialchars($_SESSION["user"]['email'] ?? '') ?></span>
-                                </div>
-                            </li>
-                            <li class="menu-divider"></li>
-                            <li><a class="menu-item" href="../profile.php"><i class="icon-user"></i>Мой профиль</a></li>
-                            <li><a class="menu-item" href="../orders.php"><i class="icon-orders"></i>Мои заказы</a></li>
-                            <li><a class="menu-item" href="../favorites.php"><i class="icon-heart"></i>Избранное</a></li>
-                            <?php if (isset($_SESSION['user']['is_admin']) && $_SESSION['user']['is_admin']): ?>
+                        <nav class="account">
+                            <?php
+                                $is_admin_session = isset($_SESSION['user']['is_admin']) && $_SESSION['user']['is_admin'];
+                                $default_avatar_path_from_root = '/img/icons8.png'; // Дефолтный для обычных пользователей
+                                $admin_avatar_path_from_root = '/img/admin-avatar.png'; // <-- ПУТЬ К ВАШЕЙ АДМИНСКОЙ АВАТАРКЕ
+
+                                $avatar_to_display = $default_avatar_path_from_root; // По умолчанию
+
+                                if ($is_admin_session) {
+                                    // Если это админ, всегда показываем специальную админскую аватарку
+                                    // Убедитесь, что файл /img/admin-avatar.png существует
+                                    if (file_exists($_SERVER['DOCUMENT_ROOT'] . $admin_avatar_path_from_root)) {
+                                        $avatar_to_display = $admin_avatar_path_from_root;
+                                    } else {
+                                        // Если админская аватарка не найдена, можно использовать дефолтную или другую заглушку
+                                        // $avatar_to_display = $default_avatar_path_from_root; // или например '/img/default-admin.png'
+                                        error_log("Admin avatar not found: " . $_SERVER['DOCUMENT_ROOT'] . $admin_avatar_path_from_root);
+                                    }
+                                } elseif (isset($_SESSION['user']['avatar']) && !empty($_SESSION['user']['avatar'])) {
+                                    // Это обычный пользователь, пытаемся загрузить его аватар
+                                    $user_avatar_from_session = '/' . ltrim($_SESSION['user']['avatar'], '/');
+                                    if (file_exists($_SERVER['DOCUMENT_ROOT'] . $user_avatar_from_session)) {
+                                        $avatar_to_display = htmlspecialchars($user_avatar_from_session);
+                                    }
+                                    // Если у пользователя нет аватара или файл не найден, останется $default_avatar_path_from_root
+                                }
+                            ?>
+                            <img src="<?php echo $avatar_to_display; ?>" class="profile-avatar" alt="Профиль">
+                        </nav>
+                        <?php if (!isset($_SESSION['user'])): ?>
+                            <ul class="submenu">
+                                <li><a class="log" href="/auth/authorization.php">Вход</a></li>
+                                <li><a class="log" href="/auth/register.php">Регистрация</a></li>
+                            </ul>
+                        <?php else: // Пользователь авторизован ?>
+                            <ul class="submenu">
+                                <li class="user-info">
+                                    <div class="user-avatar">
+                                        <?php
+                                            // Логика для аватара в user-info такая же, как для иконки профиля
+                                            $avatar_for_user_info = $default_avatar_path_from_root; // Дефолтный для обычных в подменю
+                                            if ($is_admin_session) {
+                                                if (file_exists($_SERVER['DOCUMENT_ROOT'] . $admin_avatar_path_from_root)) {
+                                                    $avatar_for_user_info = $admin_avatar_path_from_root;
+                                                }
+                                            } elseif (isset($_SESSION['user']['avatar']) && !empty($_SESSION['user']['avatar'])) {
+                                                $user_avatar_from_session_submenu = '/' . ltrim($_SESSION['user']['avatar'], '/');
+                                                if (file_exists($_SERVER['DOCUMENT_ROOT'] . $user_avatar_from_session_submenu)) {
+                                                    $avatar_for_user_info = htmlspecialchars($user_avatar_from_session_submenu);
+                                                } else {
+                                                    // Если у пользователя есть запись об аватаре, но файл не найден, можно использовать дефолтный
+                                                    $avatar_for_user_info = '/img/default-avatar.jpg';
+                                                }
+                                            } else {
+                                            $avatar_for_user_info = '/img/default-avatar.jpg'; // Для пользователей без аватара в подменю
+                                            }
+                                        ?>
+                                        <img src="<?php echo $avatar_for_user_info; ?>" alt="Аватар">
+                                    </div>
+                                    <div class="user-details">
+                                        <span class="user-name"><?= htmlspecialchars($_SESSION["user"]['first_name'] ?? ($_SESSION["user"]['name'] ?? 'Пользователь')) ?></span>
+                                        <span class="user-email"><?= htmlspecialchars($_SESSION["user"]['email'] ?? '') ?></span>
+                                    </div>
+                                </li>
                                 <li class="menu-divider"></li>
-                                <li><a class="menu-item admin" href="../admin/admin_dashboard.php"><i class="icon-admin"></i>Админ-панель</a></li>
-                            <?php endif; ?>
-                            <li class="menu-divider"></li>
-                            <li><a class="menu-item logout" href="../config/logout.php"><i class="icon-logout"></i>Выход</a></li>
-                        </ul>
-                    <?php endif; ?>
-                </nav>
+
+                                <?php if ($is_admin_session): // Если это администратор ?>
+                                    <li><a class="menu-item admin" href="/admin/admin_dashboard.php"><i class="icon-admin"></i>Админ-панель</a></li>
+                                <?php else: // Если это обычный пользователь ?>
+                                    <li><a class="menu-item" href="/profile/profile.php"><i class="icon-user"></i>Мой профиль</a></li>
+                                    <li><a class="menu-item" href="/profile/orders.php"><i class="icon-orders"></i>Мои заказы</a></li>
+                                    <li><a class="menu-item" href="/profile/support.php"><i class="icon-heart"></i>Поддержка</a></li>
+                                <?php endif; ?>
+
+                                <li class="menu-divider"></li>
+                                <li><a class="menu-item logout" href="/config/logout.php"><i class="icon-logout"></i>Выход</a></li>
+                            </ul>
+                        <?php endif; ?>
+                    </nav>
                 </div>
             </div>
         </div>
@@ -216,7 +265,7 @@ if (isset($_GET['from']) && $_GET['from'] === 'main') {
         <div class="container">
             <div class="page-standalone-back-button-wrapper">
                 <a href="<?php echo htmlspecialchars($back_url); ?>" class="page-header__back-button-textual" title="Вернуться назад">
-                    <span class="material-icons-outlined">arrow_back_ios_new</span> Вернуться назад
+                    <span class="material-icons-outlined">arrow_back_ios_new</span> Вернуться к новстям
                 </a>
             </div>
             <h1 class="section-subtitle news-detail__main-title-override"><?php echo htmlspecialchars($news_item['title']); ?></h1>
@@ -227,7 +276,7 @@ if (isset($_GET['from']) && $_GET['from'] === 'main') {
                     <div class="swiper-container news-swiper">
                         <div class="swiper-wrapper">
                             <?php foreach ($slider_images as $image_path): ?>
-                                <div class="swiper-slide"> <img src="<?php echo htmlspecialchars($image_path); ?>" alt="<?php echo htmlspecialchars($news_item['title']); ?>"> </div>
+                                <div class="swiper-slide"> <img src="../<?php echo htmlspecialchars(ltrim($image_path, '/')); ?>" alt="<?php echo htmlspecialchars($news_item['title']); ?>"> </div>
                             <?php endforeach; ?>
                         </div>
                         <div class="swiper-pagination"></div>
@@ -308,7 +357,41 @@ if (isset($_GET['from']) && $_GET['from'] === 'main') {
                         <ul class="comment-list">
                             <?php foreach ($comments as $comment): ?>
                                 <li class="comment-item">
-                                    <div class="comment-avatar"> <img src="<?php echo (!empty($comment['user_avatar'])) ? htmlspecialchars($comment['user_avatar']) : '../img/default-avatar.jpg'; ?>" alt="Аватар"> </div>
+                                    <div class="comment-avatar">
+                                        <?php
+                                        $display_comment_initials = true;
+                                        $avatar_comment_src = '';
+                                        $author_name_for_initials = $comment['author_name']; // Имя для инициалов (может быть от гостя или пользователя)
+
+                                        // Проверяем, есть ли аватар пользователя (если комментарий от зарегистрированного)
+                                        if (!empty($comment['user_avatar'])) {
+                                            // Путь из БД (user_avatar) хранится от корня сайта
+                                            // Формируем путь к файлу относительно текущего скрипта (Новости/news_detail.php)
+                                            $path_to_comment_avatar_from_script = '../' . ltrim($comment['user_avatar'], '/');
+
+                                            if (file_exists($path_to_comment_avatar_from_script)) {
+                                                $avatar_comment_src = htmlspecialchars($path_to_comment_avatar_from_script);
+                                                $display_comment_initials = false;
+                                            }
+                                        }
+
+                                        if ($display_comment_initials) {
+                                            $initial_comment = '';
+                                            if (!empty($author_name_for_initials)) {
+                                                if (function_exists('mb_strtoupper') && function_exists('mb_substr')) {
+                                                    $initial_comment = htmlspecialchars(mb_strtoupper(mb_substr($author_name_for_initials, 0, 1, 'UTF-8')));
+                                                } elseif (function_exists('strtoupper') && function_exists('substr')) {
+                                                    $initial_comment = htmlspecialchars(strtoupper(substr($author_name_for_initials, 0, 1)));
+                                                }
+                                            }
+                                            // Используем класс, который вы, возможно, уже стилизовали для инициалов отзывов
+                                            // или создайте новый класс .comment-avatar-initials
+                                            echo '<div class="testimonial__img_initials comment-avatar-initials">' . $initial_comment . '</div>';
+                                        } else {
+                                            echo '<img src="' . $avatar_comment_src . '" alt="Аватар ' . htmlspecialchars($comment['author_name']) . '">';
+                                        }
+                                        ?>
+                                    </div>
                                     <div class="comment-content">
                                         <p class="comment-author"><?php echo htmlspecialchars($comment['author_name']); ?></p>
                                         <p class="comment-date"><?php echo date('d.m.Y в H:i', strtotime($comment['created_at'])); ?></p>

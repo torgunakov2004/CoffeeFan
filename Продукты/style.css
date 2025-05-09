@@ -284,6 +284,21 @@ input {
 .remove-from-cart-btn:hover { background-color: #e60000; transform: scale(1.05); }
 .popular__actions .material-icons-outlined { font-size: 20px; }
 
+.testimonial__img_initials {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #C99E71;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 700;
+    color: #14110E;
+    flex-shrink: 0;
+    border: 2px solid #C99E71;
+}
+
 /* Menu Section Styles */
 .menu-wrap {
     display: grid;

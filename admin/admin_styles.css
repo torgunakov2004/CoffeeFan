@@ -1,127 +1,356 @@
-
+/* admin_styles.css - предполагаем, что этот файл используется как основной */
 body {
     font-family: 'Urbanist', sans-serif;
-    background-color: #f8f9fa;
+    background-color: #f0f2f5; /* Немного другой фон для админки */
     color: #333;
     margin: 0;
     line-height: 1.6;
 }
 
 .container {
-    max-width: 1140px;
-    margin: 0 auto;
-    padding: 0 15px;
+    max-width: 1200px; /* Чуть шире для админки */
+    margin: 20px auto; /* Отступы сверху/снизу */
+    padding: 0 20px;
 }
 
 .admin-header {
-    background-color: #343a40;
-    color: #fff;
-    padding: 15px 0;
+    background-color: #2c3e50;
+    color: #ecf0f1;
+    padding: 0 20px; 
     margin-bottom: 30px;
+    border-bottom: 3px solid #C99E71;
+    height: 70px; /* Фиксированная высота */
+    display: flex; 
+    align-items: center; 
+}
+
+.admin-header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-top: 0; 
+    margin-bottom: 0;
+    padding: 0; 
 }
 
 .admin-header h1 {
-    text-align: center;
     margin: 0;
-    font-size: 1.8em;
+    font-size: 1.6em; /* Можно еще немного уменьшить, если нужно */
     font-family: 'Righteous', cursive;
+    color: #FFFFFF;
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    /* max-width: 300px;  Уменьшаем, чтобы дать больше места меню */
+    /* Динамически распределим место через flex */
+    flex-grow: 0; /* Не будет растягиваться */
+    flex-shrink: 1; /* Позволит сжиматься, если нужно */
+    min-width: 150px; /* Минимальная ширина, чтобы не исчез совсем */
 }
+
+.admin-header nav {
+    flex-grow: 1; /* Навигация займет оставшееся место */
+    display: flex;
+    justify-content: flex-end; /* Прижимаем меню к правому краю */
+}
+
 .admin-header nav ul {
     list-style: none;
     padding: 0;
-    margin: 10px 0 0 0;
-    text-align: center;
+    margin: 0;
+    display: flex;
+    align-items: center; 
+    flex-wrap: nowrap; 
 }
+
 .admin-header nav ul li {
-    display: inline-block;
-    margin: 0 15px;
+    margin-left: 10px; /* Уменьшаем отступ между пунктами */
 }
+
 .admin-header nav ul li a {
-    color: #f8f9fa;
+    color: #bdc3c7;
     text-decoration: none;
     font-weight: 500;
-    padding: 5px 0;
-    border-bottom: 2px solid transparent;
-    transition: color 0.3s ease, border-color 0.3s ease;
+    padding: 7px 9px; /* Слегка уменьшаем padding */
+    border-radius: 4px;
+    transition: color 0.3s ease, background-color 0.3s ease;
+    white-space: nowrap; 
+    font-size: 0.85em; /* Уменьшаем шрифт пунктов меню */
+    display: block; /* Чтобы padding работал корректно */
 }
+
 .admin-header nav ul li a:hover,
 .admin-header nav ul li a.active {
-    color: #C99E71; /* Цвет вашего бренда */
-    border-bottom-color: #C99E71;
+    color: #FFFFFF;
+    background-color: #C99E71;
+}
+
+/* Стили для новых/измененных кнопок */
+.admin-header nav ul li.site-link a {
+    background-color: #1abc9c; /* Бирюзовый */
+    color: white;
+}
+.admin-header nav ul li.site-link a:hover {
+    background-color: #16a085;
+}
+
+.admin-header nav ul li.logout-link a {
+    background-color: #e74c3c; /* Красный */
+    color: white;
+}
+.admin-header nav ul li.logout-link a:hover {
+    background-color: #c0392b;
 }
 
 
 .admin-content {
     background-color: #ffffff;
-    padding: 20px 30px;
+    padding: 25px 30px;
     border-radius: 8px;
-    box-shadow: 0 0 15px rgba(0,0,0,0.05);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
     margin-bottom: 30px;
 }
 
-.admin-content h2 {
-    color: #343a40;
+.admin-content h1, .admin-content h2 {
+    color: #2c3e50;
     margin-top: 0;
     margin-bottom: 25px;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 10px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e7e7e7;
     font-family: 'Righteous', cursive;
 }
+.admin-content h1 { font-size: 1.8em; }
+.admin-content h2 { font-size: 1.5em; }
 
 /* Стили для таблицы */
-.admin-content table { width: 100%; border-collapse: collapse; margin-top: 20px; color: #333; background-color: #fff; font-size: 0.95em; }
-.admin-content th, .admin-content td { border: 1px solid #dee2e6; padding: 10px 12px; text-align: left; vertical-align: middle; }
-.admin-content th { background-color: #e9ecef; font-weight: 600; }
-.admin-content tr:nth-child(even) { background-color: #f8f9fa; }
-.admin-content img.thumbnail { max-width: 80px; max-height: 60px; height: auto; display: block; border-radius: 4px; }
-.admin-content .action-btn { display: inline-block; padding: 5px 10px; margin-right: 5px; border-radius: 4px; text-decoration: none; font-size: 0.9em; border: none; cursor: pointer; transition: opacity 0.3s ease;}
-.admin-content .action-btn:hover { opacity: 0.8; }
-.admin-content .edit-btn { background-color: #17a2b8; color: white; } /* Info color */
-.admin-content .delete-btn { background-color: #dc3545; color: white; } /* Danger color */
-.admin-content .add-btn { display: inline-block; padding: 10px 15px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; margin-bottom: 20px; transition: background-color 0.3s ease;}
-.admin-content .add-btn:hover { background-color: #0056b3; }
-.admin-content .message { padding: 15px; margin-bottom: 20px; border-radius: 5px; border: 1px solid transparent; }
-.admin-content .message.success { background-color: #d4edda; color: #155724; border-color: #c3e6cb; }
-.admin-content .message.error { background-color: #f8d7da; color: #721c24; border-color: #f5c6cb; }
+.admin-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.9em; }
+.admin-table th, .admin-table td { border: 1px solid #e0e0e0; padding: 10px 14px; text-align: left; vertical-align: middle; }
+.admin-table th { background-color: #f1f3f5; font-weight: 600; color: #495057; }
+.admin-table tr:nth-child(even) { background-color: #f9f9f9; }
+.admin-table tr:hover { background-color: #f1f8ff; }
+.admin-table img.thumbnail { max-width: 100px; max-height: 70px; height: auto; display: block; border-radius: 4px; border: 1px solid #ddd; }
+.admin-table .actions a, .admin-table .actions button { display: inline-block; padding: 6px 10px; margin-right: 5px; margin-bottom: 5px; border-radius: 4px; text-decoration: none; font-size: 0.85em; border: none; cursor: pointer; transition: opacity 0.2s ease, transform 0.2s ease; color: white; }
+.admin-table .actions a:hover, .admin-table .actions button:hover { opacity: 0.85; transform: translateY(-1px); }
+.admin-table .edit-btn { background-color: #3498db; } /* Голубой */
+.admin-table .delete-btn { background-color: #e74c3c; } /* Красный */
+.admin-table .view-btn { background-color: #1abc9c; } /* Бирюзовый */
+
+
+.add-new-btn { display: inline-block; padding: 10px 18px; background-color: #2ecc71; color: white; text-decoration: none; border-radius: 5px; margin-bottom: 25px; transition: background-color 0.3s ease; font-weight: 500; }
+.add-new-btn:hover { background-color: #27ae60; }
+.add-new-btn .material-icons-outlined { vertical-align: middle; margin-right: 5px; font-size: 1.2em; }
+
+
+.message { padding: 15px 20px; margin-bottom: 20px; border-radius: 5px; border: 1px solid transparent; font-size: 0.95em;}
+.message.success { background-color: #d1e7dd; color: #0f5132; border-color: #badbcc; }
+.message.error { background-color: #f8d7da; color: #842029; border-color: #f5c2c7; }
+.message.info { background-color: #cff4fc; color: #055160; border-color: #b6effb; }
+
+
 .status-active { color: #28a745; font-weight: bold; }
 .status-inactive { color: #dc3545; }
-.toggle-status-btn { cursor: pointer; text-decoration: underline; color: #007bff; margin-left: 5px; }
-.toggle-status-btn:hover { text-decoration: none; }
+.status-pending { color: #fd7e14; }
+.status-approved { color: #28a745; }
+.status-rejected { color: #dc3545; }
+
 
 /* Стили для формы */
-.admin-content form { max-width: 700px; margin: 20px 0; /* Убрал auto, чтобы не центрировать */ padding: 25px; background-color: #fff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); color: #333; }
-.admin-content .form-group { margin-bottom: 20px; }
-.admin-content label { display: block; margin-bottom: 8px; font-weight: 600; }
-.admin-content input[type="text"],
-.admin-content input[type="url"],
-.admin-content textarea,
-.admin-content select {
+.admin-form { max-width: 800px; margin: 20px 0; padding: 30px; background-color: #fdfdfd; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.07); }
+.admin-form .form-group { margin-bottom: 22px; }
+.admin-form label { display: block; margin-bottom: 8px; font-weight: 600; color: #495057; font-size: 0.9em;}
+.admin-form input[type="text"],
+.admin-form input[type="email"],
+.admin-form input[type="password"],
+.admin-form input[type="number"],
+.admin-form input[type="url"],
+.admin-form input[type="date"],
+.admin-form input[type="time"],
+.admin-form textarea,
+.admin-form select {
     width: 100%;
-    padding: 10px 12px;
+    padding: 10px 14px;
     border: 1px solid #ced4da;
     border-radius: 4px;
     box-sizing: border-box;
-    font-size: 1em;
-    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    font-size: 0.95em;
+    background-color: #fff;
+    color: #495057;
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
-.admin-content input[type="text"]:focus,
-.admin-content input[type="url"]:focus,
-.admin-content textarea:focus,
-.admin-content select:focus {
-    border-color: #80bdff;
+.admin-form input:focus, .admin-form textarea:focus, .admin-form select:focus {
+    border-color: #86b7fe;
     outline: 0;
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
 }
-.admin-content textarea { min-height: 120px; resize: vertical; }
-.admin-content input[type="file"] { border: none; padding: 5px 0; }
-.admin-content .current-image { margin-top: 10px; }
-.admin-content .current-image img { max-width: 200px; max-height: 150px; height: auto; border-radius: 4px; border: 1px solid #eee;}
-.admin-content input[type="checkbox"] { width: auto; margin-right: 10px; vertical-align: middle; height: 1em; width: 1em; }
-.admin-content .form-actions button,
-.admin-content .form-actions a { display: inline-block; padding: 12px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 1em; text-decoration: none; }
-.admin-content .btn-save { background-color: #28a745; color: white; }
-.admin-content .btn-save:hover { background-color: #218838; }
-.admin-content .btn-cancel { background-color: #6c757d; color: white; margin-left: 10px; }
-.admin-content .btn-cancel:hover { background-color: #5a6268; }
-.admin-content .error-list { color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; padding: 10px 15px; margin-bottom: 15px; border-radius: 4px; list-style-position: inside; }
-.admin-content .error-list li { margin-bottom: 5px; }
+.admin-form textarea { min-height: 150px; resize: vertical; }
+.admin-form input[type="file"] { border: none; padding: 8px 0; font-size: 0.9em; }
+.admin-form .current-image-container { margin-top: 10px; margin-bottom: 10px; }
+.admin-form .current-image { max-width: 250px; max-height: 180px; height: auto; border-radius: 4px; border: 1px solid #eee; display: block; }
+.admin-form input[type="checkbox"] { width: auto; margin-right: 8px; vertical-align: middle; height: 1.1em; width: 1.1em; accent-color: #C99E71;}
+.admin-form .checkbox-label { font-weight: normal; display: inline-flex; align-items: center; }
+
+.admin-form .form-actions { margin-top: 30px; display: flex; gap: 10px; justify-content: flex-start; }
+.admin-form .form-actions button, .admin-form .form-actions a { padding: 12px 25px; border: none; border-radius: 5px; cursor: pointer; font-size: 0.95em; text-decoration: none; font-weight: 500; }
+.admin-form .btn-save { background-color: #198754; color: white; } /* Зеленый Bootstrap */
+.admin-form .btn-save:hover { background-color: #157347; }
+.admin-form .btn-cancel { background-color: #6c757d; color: white; } /* Серый Bootstrap */
+.admin-form .btn-cancel:hover { background-color: #5a6268; }
+
+.error-list { color: #842029; background-color: #f8d7da; border: 1px solid #f5c2c7; padding: 12px 18px; margin-bottom: 20px; border-radius: 4px; list-style-position: inside; }
+.error-list li { margin-bottom: 6px; }
+
+/* BBCode Toolbar */
+.bbcode-toolbar {
+    margin-bottom: 5px;
+    padding: 5px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-bottom: none;
+    border-radius: 4px 4px 0 0;
+}
+.bbcode-toolbar button {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    padding: 3px 8px;
+    margin-right: 3px;
+    cursor: pointer;
+    border-radius: 3px;
+    font-size: 0.85em;
+}
+.bbcode-toolbar button:hover {
+    background-color: #e0e0e0;
+}
+
+/* Gallery Edit */
+.gallery-edit {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 10px;
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #eee;
+    border-radius: 4px;
+}
+.gallery-item-edit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    border: 1px solid #ddd;
+    padding: 8px;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+}
+.gallery-item-edit img {
+    max-width: 120px;
+    max-height: 90px;
+    height: auto;
+    border-radius: 3px;
+}
+.gallery-item-edit label {
+    font-size: 0.8em;
+    color: #555;
+    display: flex;
+    align-items: center;
+}
+.gallery-item-edit input[type="checkbox"] {
+    margin-right: 5px;
+}
+
+/* Back link */
+.back-link {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 8px 15px;
+    background-color: #6c757d;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+.back-link:hover {
+    background-color: #5a6268;
+}
+
+
+
+/* Адаптивность */
+@media (max-width: 1100px) { /* Более ранняя точка для адаптации меню */
+    .admin-header h1 {
+        font-size: 1.4em;
+        min-width: 120px;
+    }
+    .admin-header nav ul li {
+        margin-left: 8px;
+    }
+    .admin-header nav ul li a {
+        padding: 6px 8px;
+        font-size: 0.8em;
+    }
+}
+@media (max-width: 992px) { 
+    .admin-header h1 {
+        font-size: 1.3em; 
+        max-width: 250px; 
+        min-width: 100px;
+    }
+    .admin-header nav ul li {
+        margin-left: 5px; 
+    }
+    .admin-header nav ul li a {
+        padding: 5px 6px;
+        font-size: 0.75em; 
+    }
+}
+@media (max-width: 768px) {
+    .container {
+        margin: 15px auto;
+        padding: 0 15px;
+    }
+    .admin-header {
+        height: auto; 
+        padding: 15px 20px; 
+    }
+    .admin-header .container {
+        flex-direction: column; 
+        gap: 15px; /* Увеличим немного отступ */
+    }
+    .admin-header h1 {
+        white-space: normal; 
+        text-align: center;
+        max-width: 100%; 
+        font-size: 1.6em; /* Можно вернуть побольше, т.к. он один в строке */
+        min-width: auto;
+    }
+    .admin-header nav {
+        width: 100%; /* Навигация на всю ширину */
+        justify-content: center; /* Центрируем ul */
+    }
+    .admin-header nav ul {
+        flex-wrap: wrap; 
+        justify-content: center; 
+    }
+    .admin-header nav ul li {
+        margin: 5px; 
+    }
+    .admin-header nav ul li a {
+        font-size: 0.9em; /* Возвращаем нормальный размер шрифта для мобильных */
+        padding: 8px 10px;
+    }
+    .admin-content {
+        padding: 20px;
+    }
+    .admin-table th, .admin-table td {
+        padding: 8px 10px;
+        font-size: 0.85em;
+    }
+    .admin-table .actions a, .admin-table .actions button {
+        font-size: 0.8em;
+        padding: 5px 8px;
+    }
+    .admin-form {
+        padding: 20px;
+    }
+}

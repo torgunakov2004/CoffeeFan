@@ -18,11 +18,11 @@ if ($stmt) {
         while ($item = $result->fetch_assoc()) {
             $html .= '<div class="menu">';
             $html .= '  <div class="menu__img-container">';
-            $html .= '      <img class="menu__img" src="' . htmlspecialchars($item['image']) . '" alt="' . htmlspecialchars($item['title']) . '">';
+            $image_path_from_root = ltrim($item['image'], '/'); // Убираем возможный ведущий слэш
+            $html .= '      <img class="menu__img" src="../' . htmlspecialchars($image_path_from_root) . '" alt="' . htmlspecialchars($item['title']) . '">';
             $html .= '  </div>';
             $html .= '  <div class="menu__content">';
             $html .= '      <h3 class="menu__title">' . htmlspecialchars($item['title']) . '</h3>';
-            $html .= '      <p class="menu__description">' . htmlspecialchars($item['description'] ?? '') . '</p>';
             $html .= '      <b class="menu__price">' . htmlspecialchars($item['price']) . ' ₽</b>';
             $html .= '  </div>';
             $html .= '</div>';

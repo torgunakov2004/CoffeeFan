@@ -128,9 +128,16 @@ if ($stmt_menu) {
     error_log("Ошибка подготовки запроса меню: " . $connect->error);
 }
 
-$reviews = mysqli_query($connect, "SELECT * FROM `reviews` WHERE `status` = 'approved' ORDER BY `id` DESC LIMIT 3");
+$reviews_query_sql = "SELECT r.*, u.avatar as user_avatar_path 
+                      FROM `reviews` r 
+                      LEFT JOIN `user` u ON r.user_id = u.id 
+                      WHERE r.`status` = 'approved' 
+                      ORDER BY r.`id` DESC 
+                      LIMIT 3";
+$reviews = mysqli_query($connect, $reviews_query_sql);
+
 if (!$reviews) {
-    error_log("Ошибка выполнения запроса отзывов: " . mysqli_error($connect));
+    error_log("Ошибка выполнения запроса отзывов на странице Продукты: " . mysqli_error($connect));
 }
 ?>
 
@@ -172,34 +179,81 @@ if (!$reviews) {
                     </a>
                     <nav class="profile">
                         <nav class="account">
-                            <img src="<?php echo $_SESSION['user']['avatar'] ?? '../img/icons8.png'; ?>" class="profile-avatar" alt="Аватар профиля">
+                            <?php
+                                $is_admin_session = isset($_SESSION['user']['is_admin']) && $_SESSION['user']['is_admin'];
+                                $default_avatar_path_from_root = '/img/icons8.png'; // Дефолтный для обычных пользователей
+                                $admin_avatar_path_from_root = '/img/admin-avatar.png'; // <-- ПУТЬ К ВАШЕЙ АДМИНСКОЙ АВАТАРКЕ
+
+                                $avatar_to_display = $default_avatar_path_from_root; // По умолчанию
+
+                                if ($is_admin_session) {
+                                    // Если это админ, всегда показываем специальную админскую аватарку
+                                    // Убедитесь, что файл /img/admin-avatar.png существует
+                                    if (file_exists($_SERVER['DOCUMENT_ROOT'] . $admin_avatar_path_from_root)) {
+                                        $avatar_to_display = $admin_avatar_path_from_root;
+                                    } else {
+                                        // Если админская аватарка не найдена, можно использовать дефолтную или другую заглушку
+                                        // $avatar_to_display = $default_avatar_path_from_root; // или например '/img/default-admin.png'
+                                        error_log("Admin avatar not found: " . $_SERVER['DOCUMENT_ROOT'] . $admin_avatar_path_from_root);
+                                    }
+                                } elseif (isset($_SESSION['user']['avatar']) && !empty($_SESSION['user']['avatar'])) {
+                                    // Это обычный пользователь, пытаемся загрузить его аватар
+                                    $user_avatar_from_session = '/' . ltrim($_SESSION['user']['avatar'], '/');
+                                    if (file_exists($_SERVER['DOCUMENT_ROOT'] . $user_avatar_from_session)) {
+                                        $avatar_to_display = htmlspecialchars($user_avatar_from_session);
+                                    }
+                                    // Если у пользователя нет аватара или файл не найден, останется $default_avatar_path_from_root
+                                }
+                            ?>
+                            <img src="<?php echo $avatar_to_display; ?>" class="profile-avatar" alt="Профиль">
                         </nav>
                         <?php if (!isset($_SESSION['user'])): ?>
                             <ul class="submenu">
-                                <li><a class="log" href="../auth/authorization.php">Вход</a></li>
-                                <li><a class="log" href="../auth/register.php">Регистрация</a></li>
+                                <li><a class="log" href="/auth/authorization.php">Вход</a></li>
+                                <li><a class="log" href="/auth/register.php">Регистрация</a></li>
                             </ul>
-                        <?php else: ?>
+                        <?php else: // Пользователь авторизован ?>
                             <ul class="submenu">
                                 <li class="user-info">
                                     <div class="user-avatar">
-                                        <img src="<?php echo $_SESSION['user']['avatar'] ?? '../img/default-avatar.jpg'; ?>" alt="Аватар">
+                                        <?php
+                                            // Логика для аватара в user-info такая же, как для иконки профиля
+                                            $avatar_for_user_info = $default_avatar_path_from_root; // Дефолтный для обычных в подменю
+                                            if ($is_admin_session) {
+                                                if (file_exists($_SERVER['DOCUMENT_ROOT'] . $admin_avatar_path_from_root)) {
+                                                    $avatar_for_user_info = $admin_avatar_path_from_root;
+                                                }
+                                            } elseif (isset($_SESSION['user']['avatar']) && !empty($_SESSION['user']['avatar'])) {
+                                                $user_avatar_from_session_submenu = '/' . ltrim($_SESSION['user']['avatar'], '/');
+                                                if (file_exists($_SERVER['DOCUMENT_ROOT'] . $user_avatar_from_session_submenu)) {
+                                                    $avatar_for_user_info = htmlspecialchars($user_avatar_from_session_submenu);
+                                                } else {
+                                                    // Если у пользователя есть запись об аватаре, но файл не найден, можно использовать дефолтный
+                                                    $avatar_for_user_info = '/img/default-avatar.jpg';
+                                                }
+                                            } else {
+                                            $avatar_for_user_info = '/img/default-avatar.jpg'; // Для пользователей без аватара в подменю
+                                            }
+                                        ?>
+                                        <img src="<?php echo $avatar_for_user_info; ?>" alt="Аватар">
                                     </div>
                                     <div class="user-details">
                                         <span class="user-name"><?= htmlspecialchars($_SESSION["user"]['first_name'] ?? ($_SESSION["user"]['name'] ?? 'Пользователь')) ?></span>
-                                        <span class="user-email"><?= htmlspecialchars($_SESSION["user"]['email']) ?></span>
+                                        <span class="user-email"><?= htmlspecialchars($_SESSION["user"]['email'] ?? '') ?></span>
                                     </div>
                                 </li>
                                 <li class="menu-divider"></li>
-                                <li><a class="menu-item" href="../profile.php"><i class="icon-user"></i>Мой профиль</a></li>
-                                <li><a class="menu-item" href="../orders.php"><i class="icon-orders"></i>Мои заказы</a></li>
-                                <li><a class="menu-item" href="../favorites.php"><i class="icon-heart"></i>Избранное</a></li>
-                                <?php if (isset($_SESSION['user']['is_admin']) && $_SESSION['user']['is_admin']): ?>
-                                    <li class="menu-divider"></li>
-                                    <li><a class="menu-item admin" href="../admin/admin_dashboard.php"><i class="icon-admin"></i>Админ-панель</a></li>
+
+                                <?php if ($is_admin_session): // Если это администратор ?>
+                                    <li><a class="menu-item admin" href="/admin/admin_dashboard.php"><i class="icon-admin"></i>Админ-панель</a></li>
+                                <?php else: // Если это обычный пользователь ?>
+                                    <li><a class="menu-item" href="/profile/profile.php"><i class="icon-user"></i>Мой профиль</a></li>
+                                    <li><a class="menu-item" href="/profile/orders.php"><i class="icon-orders"></i>Мои заказы</a></li>
+                                    <li><a class="menu-item" href="/profile/support.php"><i class="icon-heart"></i>Поддержка</a></li>
                                 <?php endif; ?>
+
                                 <li class="menu-divider"></li>
-                                <li><a class="menu-item logout" href="../config/logout.php"><i class="icon-logout"></i>Выход</a></li>
+                                <li><a class="menu-item logout" href="/config/logout.php"><i class="icon-logout"></i>Выход</a></li>
                             </ul>
                         <?php endif; ?>
                     </nav>
@@ -395,7 +449,7 @@ if (!$reviews) {
                         <?php while ($item = $menuItems->fetch_assoc()): ?>
                             <div class="menu">
                                 <div class="menu__img-container">
-                                    <img class="menu__img" src="<?php echo htmlspecialchars($item['image']); ?>" alt="<?php echo htmlspecialchars($item['title']); ?>">
+                                <img class="menu__img" src="../<?php echo htmlspecialchars(ltrim($item['image'], '/')); ?>" alt="<?php echo htmlspecialchars($item['title']); ?>">
                                 </div>
                                 <div class="menu__content">
                                     <h3 class="menu__title"><?php echo htmlspecialchars($item['title']); ?></h3>
@@ -428,20 +482,61 @@ if (!$reviews) {
             <div class="container">
                 <h3 class="section-subtitle">Последние отзывы</h3>
                 <div class="testimonial-wrap">
-                     <?php if ($reviews && mysqli_num_rows($reviews) > 0): ?>
+                    <?php if ($reviews && mysqli_num_rows($reviews) > 0): ?>
                         <?php while ($review = mysqli_fetch_assoc($reviews)): ?>
                             <div class="testimonial">
                                 <div class="testimonial-data">
-                                    <img class="testimonial__img" src="<?php echo htmlspecialchars($review['user_avatar'] ?? '../img/testimonial-1.jpg'); ?>" alt="Аватар пользователя <?php echo htmlspecialchars($review['name']); ?>">
+                                    <?php
+                                    $display_initials_prod = true; // Флаг для страницы продуктов
+                                    $avatar_to_display_src_prod = '';
+
+                                    // Проверяем, есть ли информация об аватаре пользователя для этого отзыва
+                                    // Поле user_avatar_path должно приходить из обновленного SQL-запроса
+                                    if (!empty($review['user_avatar_path'])) {
+                                        // Путь из БД (user_avatar_path) хранится от корня сайта
+                                        // Формируем путь к файлу относительно текущего скрипта (Продукты/index.php)
+                                        $path_to_user_avatar_from_script_prod = '../' . ltrim($review['user_avatar_path'], '/');
+
+                                        if (file_exists($path_to_user_avatar_from_script_prod)) {
+                                            $avatar_to_display_src_prod = htmlspecialchars($path_to_user_avatar_from_script_prod);
+                                            $display_initials_prod = false;
+                                        }
+                                    }
+
+                                    if ($display_initials_prod) {
+                                        $initial_prod = '';
+                                        if (!empty($review['name'])) {
+                                            if (function_exists('mb_strtoupper') && function_exists('mb_substr')) {
+                                                $initial_prod = htmlspecialchars(mb_strtoupper(mb_substr($review['name'], 0, 1, 'UTF-8')));
+                                            } elseif (function_exists('strtoupper') && function_exists('substr')) {
+                                                $initial_prod = htmlspecialchars(strtoupper(substr($review['name'], 0, 1)));
+                                            }
+                                        }
+                                        // В ваших стилях для отзывов на странице продуктов уже есть testimonial__img
+                                        // Мы можем либо добавить класс testimonial__img_initials, либо использовать testimonial__img
+                                        // и стилизовать его для показа инициалов, если нет src
+                                        // Для простоты, если testimonial__img_initials уже есть в общем CSS, используем его:
+                                        echo '<div class="testimonial__img_initials">' . $initial_prod . '</div>';
+                                    } else {
+                                        echo '<img class="testimonial__img" src="' . $avatar_to_display_src_prod . '" alt="Аватар ' . htmlspecialchars($review['name']) . '">';
+                                    }
+                                    ?>
                                     <div>
                                         <h3 class="testimonial__name"><?php echo htmlspecialchars($review['name']); ?></h3>
-                                        <p class="testimonial__text section__text"><?php echo htmlspecialchars($review['review']); ?></p>
+                                        <p class="testimonial__text section__text"><?php echo nl2br(htmlspecialchars($review['review'])); // Добавил nl2br для корректного отображения переносов строк ?></p>
+                                        <?php if (isset($review['rating']) && $review['rating'] > 0): // Добавляем отображение рейтинга, если есть ?>
+                                            <div class="testimonial__rating">
+                                                <?php for ($s_i = 1; $s_i <= 5; $s_i++): ?>
+                                                    <span class="star <?php echo ($s_i <= $review['rating']) ? 'filled' : ''; ?>">★</span>
+                                                <?php endfor; ?>
+                                            </div>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             </div>
                         <?php endwhile; ?>
                     <?php else: ?>
-                        <p class="no-products-message">Отзывов пока нет.</p>
+                        <p class="no-products-message">Отзывов пока нет.</p> <?php // Убедитесь, что класс no-products-message стилизован ?>
                     <?php endif; ?>
                 </div>
             </div>

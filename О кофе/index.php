@@ -142,34 +142,81 @@ if (!$reviews_query_result) {
                 </a>
                 <nav class="profile">
                         <nav class="account">
-                             <img src="<?php echo isset($_SESSION['user']['avatar']) ? htmlspecialchars($_SESSION['user']['avatar']) : '../img/icons8.png'; ?>" class="profile-avatar" alt="Аватар профиля">
+                            <?php
+                                $is_admin_session = isset($_SESSION['user']['is_admin']) && $_SESSION['user']['is_admin'];
+                                $default_avatar_path_from_root = '/img/icons8.png'; // Дефолтный для обычных пользователей
+                                $admin_avatar_path_from_root = '/img/admin-avatar.png'; // <-- ПУТЬ К ВАШЕЙ АДМИНСКОЙ АВАТАРКЕ
+
+                                $avatar_to_display = $default_avatar_path_from_root; // По умолчанию
+
+                                if ($is_admin_session) {
+                                    // Если это админ, всегда показываем специальную админскую аватарку
+                                    // Убедитесь, что файл /img/admin-avatar.png существует
+                                    if (file_exists($_SERVER['DOCUMENT_ROOT'] . $admin_avatar_path_from_root)) {
+                                        $avatar_to_display = $admin_avatar_path_from_root;
+                                    } else {
+                                        // Если админская аватарка не найдена, можно использовать дефолтную или другую заглушку
+                                        // $avatar_to_display = $default_avatar_path_from_root; // или например '/img/default-admin.png'
+                                        error_log("Admin avatar not found: " . $_SERVER['DOCUMENT_ROOT'] . $admin_avatar_path_from_root);
+                                    }
+                                } elseif (isset($_SESSION['user']['avatar']) && !empty($_SESSION['user']['avatar'])) {
+                                    // Это обычный пользователь, пытаемся загрузить его аватар
+                                    $user_avatar_from_session = '/' . ltrim($_SESSION['user']['avatar'], '/');
+                                    if (file_exists($_SERVER['DOCUMENT_ROOT'] . $user_avatar_from_session)) {
+                                        $avatar_to_display = htmlspecialchars($user_avatar_from_session);
+                                    }
+                                    // Если у пользователя нет аватара или файл не найден, останется $default_avatar_path_from_root
+                                }
+                            ?>
+                            <img src="<?php echo $avatar_to_display; ?>" class="profile-avatar" alt="Профиль">
                         </nav>
                         <?php if (!isset($_SESSION['user'])): ?>
                             <ul class="submenu">
-                                <li><a class="log" href="../auth/authorization.php">Вход</a></li>
-                                <li><a class="log" href="../auth/register.php">Регистрация</a></li>
+                                <li><a class="log" href="/auth/authorization.php">Вход</a></li>
+                                <li><a class="log" href="/auth/register.php">Регистрация</a></li>
                             </ul>
-                        <?php else: ?>
+                        <?php else: // Пользователь авторизован ?>
                             <ul class="submenu">
                                 <li class="user-info">
                                     <div class="user-avatar">
-                                        <img src="<?php echo htmlspecialchars($_SESSION['user']['avatar'] ?? '../img/default-avatar.jpg'); ?>" alt="Аватар">
+                                        <?php
+                                            // Логика для аватара в user-info такая же, как для иконки профиля
+                                            $avatar_for_user_info = $default_avatar_path_from_root; // Дефолтный для обычных в подменю
+                                            if ($is_admin_session) {
+                                                if (file_exists($_SERVER['DOCUMENT_ROOT'] . $admin_avatar_path_from_root)) {
+                                                    $avatar_for_user_info = $admin_avatar_path_from_root;
+                                                }
+                                            } elseif (isset($_SESSION['user']['avatar']) && !empty($_SESSION['user']['avatar'])) {
+                                                $user_avatar_from_session_submenu = '/' . ltrim($_SESSION['user']['avatar'], '/');
+                                                if (file_exists($_SERVER['DOCUMENT_ROOT'] . $user_avatar_from_session_submenu)) {
+                                                    $avatar_for_user_info = htmlspecialchars($user_avatar_from_session_submenu);
+                                                } else {
+                                                    // Если у пользователя есть запись об аватаре, но файл не найден, можно использовать дефолтный
+                                                    $avatar_for_user_info = '../img/default-avatar.jpg';
+                                                }
+                                            } else {
+                                            $avatar_for_user_info = '../img/default-avatar.jpg'; // Для пользователей без аватара в подменю
+                                            }
+                                        ?>
+                                        <img src="<?php echo $avatar_for_user_info; ?>" alt="Аватар">
                                     </div>
                                     <div class="user-details">
                                         <span class="user-name"><?= htmlspecialchars($_SESSION["user"]['first_name'] ?? ($_SESSION["user"]['name'] ?? 'Пользователь')) ?></span>
-                                        <span class="user-email"><?= htmlspecialchars($_SESSION["user"]['email']) ?></span>
+                                        <span class="user-email"><?= htmlspecialchars($_SESSION["user"]['email'] ?? '') ?></span>
                                     </div>
                                 </li>
                                 <li class="menu-divider"></li>
-                                <li><a class="menu-item" href="../profile.php"><i class="icon-user"></i>Мой профиль</a></li>
-                                <li><a class="menu-item" href="../orders.php"><i class="icon-orders"></i>Мои заказы</a></li>
-                                <li><a class="menu-item" href="../favorites.php"><i class="icon-heart"></i>Избранное</a></li>
-                                <?php if (isset($_SESSION['user']['is_admin']) && $_SESSION['user']['is_admin']): ?>
-                                    <li class="menu-divider"></li>
-                                    <li><a class="menu-item admin" href="../admin/admin_dashboard.php"><i class="icon-admin"></i>Админ-панель</a></li>
+
+                                <?php if ($is_admin_session): // Если это администратор ?>
+                                    <li><a class="menu-item admin" href="/admin/admin_dashboard.php"><i class="icon-admin"></i>Админ-панель</a></li>
+                                <?php else: // Если это обычный пользователь ?>
+                                    <li><a class="menu-item" href="/profile/profile.php"><i class="icon-user"></i>Мой профиль</a></li>
+                                    <li><a class="menu-item" href="/profile/orders.php"><i class="icon-orders"></i>Мои заказы</a></li>
+                                    <li><a class="menu-item" href="/profile/support.php"><i class="icon-heart"></i>Поддержка</a></li>
                                 <?php endif; ?>
+
                                 <li class="menu-divider"></li>
-                                <li><a class="menu-item logout" href="../config/logout.php"><i class="icon-logout"></i>Выход</a></li>
+                                <li><a class="menu-item logout" href="/config/logout.php"><i class="icon-logout"></i>Выход</a></li>
                             </ul>
                         <?php endif; ?>
                     </nav>
@@ -242,12 +289,22 @@ if (!$reviews_query_result) {
                 <form id="review-form" class="review-form" method="POST" action="index.php#reviews-section">
                     <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
                     
-                    <textarea name="review" placeholder="Ваш отзыв (минимум 10 символов)" required minlength="10"></textarea>
+                    <?php if (!isset($_SESSION['user'])): // Показываем поле имени, если пользователь не авторизован ?>
+                        <div class="form-group-review"> <?php // Добавим класс для возможной стилизации ?>
+                            <label for="reviewer_name">Ваше имя:</label>
+                            <input type="text" id="reviewer_name" name="name" placeholder="Введите ваше имя" required>
+                        </div>
+                    <?php endif; ?>
+                    
+                    <div class="form-group-review"> <?php // Обернем и textarea для единообразия ?>
+                        <label for="review_text_area">Ваш отзыв:</label>
+                        <textarea id="review_text_area" name="review" placeholder="Ваш отзыв (минимум 10 символов)" required minlength="10"></textarea>
+                    </div>
                     
                     <div class="rating">
                         <p>Оцените наш сервис (необязательно):</p>
                         <div class="stars">
-                            <?php for ($i = 5; $i >= 1; $i--): // Обратный порядок для CSS трюка с ~ ?>
+                            <?php for ($i = 5; $i >= 1; $i--): ?>
                                 <input type="radio" id="star<?= $i ?>" name="rating" value="<?= $i ?>">
                                 <label for="star<?= $i ?>">★</label>
                             <?php endfor; ?>
@@ -260,42 +317,43 @@ if (!$reviews_query_result) {
                 <div class="testimonial-wrap-column"> <?php // Новый класс для вертикального расположения ?>
                     <?php if ($reviews_query_result && mysqli_num_rows($reviews_query_result) > 0): ?>
                         <?php while ($review = mysqli_fetch_assoc($reviews_query_result)): ?>
-                            <div class="testimonial"> <?php // Используем класс .testimonial со страницы Продукты ?>
+                            <div class="testimonial">
                                 <div class="testimonial-data">
                                     <?php
-                                    $avatar_path = '../img/default-avatar-review.png'; // Дефолтный аватар для отзывов
-                                    if (!empty($review['user_avatar_path']) && file_exists('..' . $review['user_avatar_path'])) {
-                                        // Если есть аватар пользователя и он существует
-                                        // (нужно убрать /uploads, если путь уже ../uploads/...)
-                                        // Предполагаем, что user_avatar_path хранится как /uploads/avatars/file.jpg
-                                        // или uploads/avatars/file.jpg
-                                        $corrected_avatar_path = $review['user_avatar_path'];
-                                        if (strpos($corrected_avatar_path, '../') !== 0) {
-                                             // если путь не начинается с ../, то добавляем
-                                            if ($corrected_avatar_path[0] === '/') {
-                                                $corrected_avatar_path = '..' . $corrected_avatar_path;
-                                            } else {
-                                                $corrected_avatar_path = '../' . $corrected_avatar_path;
+                                    $display_initials = true; // Флаг, что по умолчанию показываем инициалы
+                                    $avatar_to_display_src = ''; // Путь к аватару для тега img
+
+                                    // Проверяем, есть ли информация об аватаре пользователя для этого отзыва
+                                    if (!empty($review['user_avatar_path'])) {
+                                        // Путь из БД (user_avatar_path) хранится от корня сайта (например, "uploads/avatars/file.jpg")
+                                        // Формируем путь к файлу относительно текущего скрипта (О кофе/index.php)
+                                        $path_to_user_avatar_from_script = '../' . ltrim($review['user_avatar_path'], '/');
+
+                                        if (file_exists($path_to_user_avatar_from_script)) {
+                                            $avatar_to_display_src = htmlspecialchars($path_to_user_avatar_from_script);
+                                            $display_initials = false; // Пользовательский аватар найден, инициалы не нужны
+                                        }
+                                    }
+
+                                    // Если нужно показать инициалы (пользовательский аватар не найден или отзыв от гостя)
+                                    if ($display_initials) {
+                                        // Убедимся, что mbstring доступна, иначе используем стандартные функции
+                                        $initial = '';
+                                        if (!empty($review['name'])) {
+                                            if (function_exists('mb_strtoupper') && function_exists('mb_substr')) {
+                                                $initial = htmlspecialchars(mb_strtoupper(mb_substr($review['name'], 0, 1, 'UTF-8')));
+                                            } elseif (function_exists('strtoupper') && function_exists('substr')) {
+                                                $initial = htmlspecialchars(strtoupper(substr($review['name'], 0, 1)));
                                             }
                                         }
-                                         if(file_exists($corrected_avatar_path)){
-                                            $avatar_path = htmlspecialchars($corrected_avatar_path);
-                                         } else {
-                                            // Файл аватара не найден, используем первую букву имени
-                                            echo '<div class="testimonial__img_initials">' . htmlspecialchars(mb_strtoupper(mb_substr($review['name'], 0, 1, 'UTF-8'))) . '</div>';
-                                            $avatar_path = null; // Флаг, что изображение не нужно выводить
-                                         }
+                                        echo '<div class="testimonial__img_initials">' . $initial . '</div>';
                                     } else {
-                                        // Аватара нет или не найден, используем первую букву имени
-                                        echo '<div class="testimonial__img_initials">' . htmlspecialchars(mb_strtoupper(mb_substr($review['name'], 0, 1, 'UTF-8'))) . '</div>';
-                                        $avatar_path = null; // Флаг, что изображение не нужно выводить
+                                        // Показываем аватар пользователя
+                                        echo '<img class="testimonial__img" src="' . $avatar_to_display_src . '" alt="Аватар ' . htmlspecialchars($review['name']) . '">';
                                     }
                                     ?>
-                                    <?php if ($avatar_path): ?>
-                                        <img class="testimonial__img" src="<?php echo $avatar_path; ?>" alt="Аватар <?php echo htmlspecialchars($review['name']); ?>">
-                                    <?php endif; ?>
 
-                                    <div> <?php // Обёртка для имени и текста отзыва ?>
+                                    <div>
                                         <h3 class="testimonial__name"><?php echo htmlspecialchars($review['name']); ?></h3>
                                         <p class="testimonial__text section__text"><?php echo nl2br(htmlspecialchars($review['review'])); ?></p>
                                         <?php if (isset($review['rating']) && $review['rating'] > 0): ?>

@@ -71,7 +71,6 @@ $has_items_in_cart = !empty($cart_quantities);
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="menu_style.css">
     <script src="JS.js"></script>
 </head>
 <body>
@@ -114,34 +113,81 @@ $has_items_in_cart = !empty($cart_quantities);
                 </a>
                 <nav class="profile">
                     <nav class="account">
-                        <img src="img/icons8.png" class="profile-avatar">
+                        <?php
+                            $is_admin_session = isset($_SESSION['user']['is_admin']) && $_SESSION['user']['is_admin'];
+                            $default_avatar_path_from_root = '/img/icons8.png'; // Дефолтный для обычных пользователей
+                            $admin_avatar_path_from_root = '/img/admin-avatar.png'; // <-- ПУТЬ К ВАШЕЙ АДМИНСКОЙ АВАТАРКЕ
+
+                            $avatar_to_display = $default_avatar_path_from_root; // По умолчанию
+
+                            if ($is_admin_session) {
+                                // Если это админ, всегда показываем специальную админскую аватарку
+                                // Убедитесь, что файл /img/admin-avatar.png существует
+                                if (file_exists($_SERVER['DOCUMENT_ROOT'] . $admin_avatar_path_from_root)) {
+                                    $avatar_to_display = $admin_avatar_path_from_root;
+                                } else {
+                                    // Если админская аватарка не найдена, можно использовать дефолтную или другую заглушку
+                                    // $avatar_to_display = $default_avatar_path_from_root; // или например '/img/default-admin.png'
+                                    error_log("Admin avatar not found: " . $_SERVER['DOCUMENT_ROOT'] . $admin_avatar_path_from_root);
+                                }
+                            } elseif (isset($_SESSION['user']['avatar']) && !empty($_SESSION['user']['avatar'])) {
+                                // Это обычный пользователь, пытаемся загрузить его аватар
+                                $user_avatar_from_session = '/' . ltrim($_SESSION['user']['avatar'], '/');
+                                if (file_exists($_SERVER['DOCUMENT_ROOT'] . $user_avatar_from_session)) {
+                                    $avatar_to_display = htmlspecialchars($user_avatar_from_session);
+                                }
+                                // Если у пользователя нет аватара или файл не найден, останется $default_avatar_path_from_root
+                            }
+                        ?>
+                        <img src="<?php echo $avatar_to_display; ?>" class="profile-avatar" alt="Профиль">
                     </nav>
-                    <?php if (!$_SESSION): ?>
+                    <?php if (!isset($_SESSION['user'])): ?>
                         <ul class="submenu">
-                            <li><a class="log" href="auth/authorization.php">Вход</a></li>
-                            <li><a class="log" href="auth/register.php">Регистрация</a></li>
+                            <li><a class="log" href="/auth/authorization.php">Вход</a></li>
+                            <li><a class="log" href="/auth/register.php">Регистрация</a></li>
                         </ul>
-                    <?php else: ?>
+                    <?php else: // Пользователь авторизован ?>
                         <ul class="submenu">
                             <li class="user-info">
                                 <div class="user-avatar">
-                                    <img src="<?php echo $_SESSION['user']['avatar'] ?? ''; ?>" alt="Аватар">
+                                    <?php
+                                        // Логика для аватара в user-info такая же, как для иконки профиля
+                                        $avatar_for_user_info = $default_avatar_path_from_root; // Дефолтный для обычных в подменю
+                                        if ($is_admin_session) {
+                                            if (file_exists($_SERVER['DOCUMENT_ROOT'] . $admin_avatar_path_from_root)) {
+                                                $avatar_for_user_info = $admin_avatar_path_from_root;
+                                            }
+                                        } elseif (isset($_SESSION['user']['avatar']) && !empty($_SESSION['user']['avatar'])) {
+                                            $user_avatar_from_session_submenu = '/' . ltrim($_SESSION['user']['avatar'], '/');
+                                            if (file_exists($_SERVER['DOCUMENT_ROOT'] . $user_avatar_from_session_submenu)) {
+                                                $avatar_for_user_info = htmlspecialchars($user_avatar_from_session_submenu);
+                                            } else {
+                                                // Если у пользователя есть запись об аватаре, но файл не найден, можно использовать дефолтный
+                                                $avatar_for_user_info = '/img/default-avatar.jpg';
+                                            }
+                                        } else {
+                                        $avatar_for_user_info = '/img/default-avatar.jpg'; // Для пользователей без аватара в подменю
+                                        }
+                                    ?>
+                                    <img src="<?php echo $avatar_for_user_info; ?>" alt="Аватар">
                                 </div>
                                 <div class="user-details">
-                                    <span class="user-name"><?= htmlspecialchars($_SESSION["user"]['name']) ?></span>
-                                    <span class="user-email"><?= htmlspecialchars($_SESSION["user"]['email']) ?></span>
+                                    <span class="user-name"><?= htmlspecialchars($_SESSION["user"]['first_name'] ?? ($_SESSION["user"]['name'] ?? 'Пользователь')) ?></span>
+                                    <span class="user-email"><?= htmlspecialchars($_SESSION["user"]['email'] ?? '') ?></span>
                                 </div>
                             </li>
                             <li class="menu-divider"></li>
-                            <li><a class="menu-item" href="profile/profile.php"><i class="icon-user"></i>Мой профиль</a></li>
-                            <li><a class="menu-item" href="profile/orders.php"><i class="icon-orders"></i>Мои заказы</a></li>
-                            <li><a class="menu-item" href="profile/support.php"><i class="icon-heart"></i>Поддержка</a></li>
-                            <?php if ($_SESSION['admin']): ?>
-                                <li class="menu-divider"></li>
-                                <li><a class="menu-item admin" href="admin/admin_dashboard.php"><i class="icon-admin"></i>Админ-панель</a></li>
+
+                            <?php if ($is_admin_session): // Если это администратор ?>
+                                <li><a class="menu-item admin" href="/admin/admin_dashboard.php"><i class="icon-admin"></i>Админ-панель</a></li>
+                            <?php else: // Если это обычный пользователь ?>
+                                <li><a class="menu-item" href="/profile/profile.php"><i class="icon-user"></i>Мой профиль</a></li>
+                                <li><a class="menu-item" href="/profile/orders.php"><i class="icon-orders"></i>Мои заказы</a></li>
+                                <li><a class="menu-item" href="/profile/support.php"><i class="icon-heart"></i>Поддержка</a></li>
                             <?php endif; ?>
+
                             <li class="menu-divider"></li>
-                            <li><a class="menu-item logout" href="config/logout.php"><i class="icon-logout"></i>Выход</a></li>
+                            <li><a class="menu-item logout" href="/config/logout.php"><i class="icon-logout"></i>Выход</a></li>
                         </ul>
                     <?php endif; ?>
                 </nav>

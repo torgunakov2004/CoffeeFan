@@ -1,202 +1,199 @@
 <?php
 session_start();
-require_once '../config/connect.php'; // Подключение к БД
+require_once '../config/connect.php';
 
-// --- Настройки ---
-$upload_dir = '../uploads/promotions/'; // Папка для загрузки изображений акций
+$upload_dir_promotions = '../uploads/promotions/';
 $allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 $max_file_size = 5 * 1024 * 1024; // 5 MB
 
-// --- Проверка прав админа ---
-if (!isset($_SESSION['admin'])) {
-     $_SESSION['message'] = "Ошибка: Доступ запрещен.";
-     header('Location: admin_login.php');
+if (!isset($_SESSION['admin']) && !(isset($_SESSION['user']['is_admin']) && $_SESSION['user']['is_admin'])) {
+     $_SESSION['admin_message'] = "Доступ запрещен.";
+     $_SESSION['admin_message_type'] = "error";
+     header('Location: admin_login.php'); // Или на главную админки, если уже был вход
      exit();
 }
 
-// --- Обработка добавления/редактирования (POST из формы) ---
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && ($_POST['action'] === 'add' || $_POST['action'] === 'edit')) {
+if (!is_dir($upload_dir_promotions)) {
+    mkdir($upload_dir_promotions, 0777, true);
+}
 
-    $action = $_POST['action'];
-    $id = ($action === 'edit' && isset($_POST['id'])) ? (int)$_POST['id'] : null;
+function sanitize_promo_filename($filename) {
+    $filename = preg_replace("/[^a-zA-Z0-9._-]/", "_", $filename);
+    return strtolower($filename);
+}
 
-    // Получаем и экранируем данные из формы
-    $title = mysqli_real_escape_string($connect, trim($_POST['title'] ?? ''));
-    $description = mysqli_real_escape_string($connect, trim($_POST['description'] ?? ''));
-    $conditions = mysqli_real_escape_string($connect, trim($_POST['conditions'] ?? ''));
-    $link = mysqli_real_escape_string($connect, trim($_POST['link'] ?? ''));
-    $type = mysqli_real_escape_string($connect, $_POST['type'] ?? 'card');
-    $is_active = isset($_POST['is_active']) ? 1 : 0;
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $action = $_POST['action'] ?? ($_GET['action'] ?? null);
+    $id = isset($_POST['id']) ? (int)$_POST['id'] : (isset($_GET['id']) ? (int)$_GET['id'] : null);
 
-    $errors = [];
-    $old_data = $_POST; // Сохраняем введенные данные для формы в случае ошибки
+    if ($action === 'add' || $action === 'edit') {
+        $title = trim($_POST['title'] ?? '');
+        $description = trim($_POST['description'] ?? '');
+        $conditions = trim($_POST['conditions'] ?? '');
+        $link = trim($_POST['link'] ?? '');
+        $type = $_POST['type'] ?? 'card';
+        $is_active = isset($_POST['is_active']) ? 1 : 0;
+        $errors = [];
 
-    // Валидация
-    if (empty($title)) $errors[] = "Заголовок обязателен для заполнения.";
-    if (empty($description)) $errors[] = "Описание обязательно для заполнения.";
-    if (!in_array($type, ['card', 'collage'])) $errors[] = "Недопустимый тип отображения.";
-    // Добавьте другие проверки, если нужно
+        if (empty($title)) $errors[] = "Заголовок обязателен.";
+        if (empty($description)) $errors[] = "Описание обязательно.";
+        if (!in_array($type, ['card', 'collage'])) $errors[] = "Недопустимый тип отображения.";
 
-    $image_path_in_db = null; // Путь к файлу для записи в БД
-    $old_image_path = null; // Физический путь к старому файлу для удаления
+        $image_path_for_db = null;
+        $old_image_path_from_db = null;
 
-    // Получаем путь к старому изображению, если редактируем
-    if ($action === 'edit' && $id) {
-        $safe_id = mysqli_real_escape_string($connect, $id);
-        $result_old = mysqli_query($connect, "SELECT image FROM promotions WHERE id = '$safe_id'");
-        if ($row_old = mysqli_fetch_assoc($result_old)) {
-            $image_path_in_db = $row_old['image']; // Путь как он хранится в БД
-            $old_image_path = $row_old['image']; // Этот же путь используем для удаления файла
-        }
-    }
-
-    // Обработка загрузки файла
-    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-        $file = $_FILES['image'];
-
-        if (!in_array($file['type'], $allowed_types)) {
-            $errors[] = "Недопустимый тип файла изображения. Разрешены: JPG, PNG, GIF, WEBP.";
-        }
-        if ($file['size'] > $max_file_size) {
-            $errors[] = "Файл изображения слишком большой. Максимальный размер: 5 MB.";
-        }
-
-        if (empty($errors)) {
-            $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
-            $unique_name = uniqid('promo_', true) . '.' . strtolower($ext);
-            $target_path = $upload_dir . $unique_name; // Физический путь для сохранения
-
-            if (!is_dir($upload_dir)) {
-                if (!mkdir($upload_dir, 0755, true)) { // Пытаемся создать папку
-                     $errors[] = "Не удалось создать директорию для загрузки: " . $upload_dir;
-                }
+        if ($action === 'edit' && $id) {
+            $stmt_old_img = $connect->prepare("SELECT image FROM promotions WHERE id = ?");
+            $stmt_old_img->bind_param("i", $id);
+            $stmt_old_img->execute();
+            $res_old_img = $stmt_old_img->get_result();
+            if ($row_old_img = $res_old_img->fetch_assoc()) {
+                $old_image_path_from_db = $row_old_img['image'];
+                $image_path_for_db = $old_image_path_from_db; 
             }
+            $stmt_old_img->close();
+        }
 
-             if (empty($errors) && is_writable($upload_dir)) { // Проверяем права на запись
-                if (move_uploaded_file($file['tmp_name'], $target_path)) {
-                    $image_path_in_db = '../uploads/promotions/' . $unique_name; // Путь для записи в БД
+        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+            $file_tmp_name = $_FILES['image']['tmp_name'];
+            $file_name = $_FILES['image']['name'];
+            $file_size = $_FILES['image']['size'];
+            $file_type = mime_content_type($file_tmp_name);
 
-                    // Удаляем старый файл, если он был и отличается от нового
-                    if ($old_image_path && $old_image_path !== $image_path_in_db && file_exists($old_image_path)) {
-                        @unlink($old_image_path);
+            if (!in_array($file_type, $allowed_types)) {
+                $errors[] = "Недопустимый тип файла. Разрешены: JPG, PNG, GIF, WEBP.";
+            } elseif ($file_size > $max_file_size) {
+                $errors[] = "Файл слишком большой. Макс: 5MB.";
+            } else {
+                $file_extension = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+                $new_file_name = uniqid('promo_', true) . '.' . sanitize_promo_filename($file_extension);
+                $target_physical_path = $upload_dir_promotions . $new_file_name;
+
+                if (move_uploaded_file($file_tmp_name, $target_physical_path)) {
+                    $image_path_for_db = 'uploads/promotions/' . $new_file_name; 
+                    if ($action === 'edit' && !empty($old_image_path_from_db) && $old_image_path_from_db !== $image_path_for_db) {
+                         if(file_exists('../' . ltrim($old_image_path_from_db, '/'))) {
+                            unlink('../' . ltrim($old_image_path_from_db, '/'));
+                         }
                     }
                 } else {
-                    $errors[] = "Не удалось переместить загруженный файл.";
+                    $errors[] = "Ошибка перемещения загруженного файла.";
                 }
-            } elseif(empty($errors)) {
-                 $errors[] = "Директория для загрузки недоступна для записи: " . $upload_dir;
+            }
+        } elseif (isset($_FILES['image']) && $_FILES['image']['error'] !== UPLOAD_ERR_NO_FILE) {
+            $errors[] = "Ошибка при загрузке файла (код: " . $_FILES['image']['error'] . ").";
+        } elseif ($action === 'add' && (!isset($_FILES['image']) || $_FILES['image']['error'] === UPLOAD_ERR_NO_FILE)) {
+            $errors[] = "Изображение обязательно для новой акции.";
+        }
+
+        if (!empty($errors)) {
+            $_SESSION['form_errors'] = $errors;
+            $_SESSION['old_form_data'] = $_POST;
+            $redirect_url = ($action === 'edit' && $id) ? 'promotion_form.php?id=' . $id : 'promotion_form.php';
+            header('Location: ' . $redirect_url);
+            exit();
+        }
+
+        if ($action === 'edit' && $id) {
+            $stmt_update = $connect->prepare("UPDATE promotions SET title = ?, description = ?, image = ?, conditions = ?, link = ?, type = ?, is_active = ? WHERE id = ?");
+            if ($stmt_update) {
+                $stmt_update->bind_param("ssssssii", $title, $description, $image_path_for_db, $conditions, $link, $type, $is_active, $id);
+                if ($stmt_update->execute()) {
+                    $_SESSION['admin_message'] = "Акция успешно обновлена.";
+                    $_SESSION['admin_message_type'] = "success";
+                } else {
+                    $_SESSION['admin_message'] = "Ошибка обновления акции: " . $stmt_update->error;
+                    $_SESSION['admin_message_type'] = "error";
+                }
+                $stmt_update->close();
+            } else {
+                 $_SESSION['admin_message'] = "Ошибка подготовки запроса обновления: " . $connect->error;
+                 $_SESSION['admin_message_type'] = "error";
+            }
+        } elseif ($action === 'add') {
+            $stmt_insert = $connect->prepare("INSERT INTO promotions (title, description, image, conditions, link, type, is_active, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())");
+            if ($stmt_insert) {
+                $stmt_insert->bind_param("ssssssi", $title, $description, $image_path_for_db, $conditions, $link, $type, $is_active);
+                if ($stmt_insert->execute()) {
+                    $_SESSION['admin_message'] = "Акция успешно добавлена.";
+                    $_SESSION['admin_message_type'] = "success";
+                } else {
+                    $_SESSION['admin_message'] = "Ошибка добавления акции: " . $stmt_insert->error;
+                    $_SESSION['admin_message_type'] = "error";
+                }
+                $stmt_insert->close();
+            } else {
+                $_SESSION['admin_message'] = "Ошибка подготовки запроса добавления: " . $connect->error;
+                $_SESSION['admin_message_type'] = "error";
             }
         }
-    } elseif (isset($_FILES['image']) && $_FILES['image']['error'] !== UPLOAD_ERR_NO_FILE) {
-        $errors[] = "Ошибка при загрузке файла изображения (код: " . $_FILES['image']['error'] . ").";
-    } elseif ($action === 'add' && (!isset($_FILES['image']) || $_FILES['image']['error'] === UPLOAD_ERR_NO_FILE)) {
-        $errors[] = "Изображение обязательно при добавлении новой акции.";
-    }
-
-
-    // Если есть ошибки, возвращаемся на форму
-    if (!empty($errors)) {
-        $_SESSION['errors'] = $errors;
-        $_SESSION['old_data'] = $old_data;
-        $redirect_url = ($action === 'edit' && $id) ? 'promotion_form.php?id=' . $id : 'promotion_form.php';
-        header('Location: ' . $redirect_url);
+        header('Location: promotions_list.php');
         exit();
-    }
 
-    // Сохраняем в БД
-    if ($action === 'edit' && $id) { // Редактирование
-        $safe_id = mysqli_real_escape_string($connect, $id);
-        $image_sql_part = ($image_path_in_db !== $old_image_path || $old_image_path === null) ? ", image = '$image_path_in_db'" : ""; // Обновляем картинку только если она изменилась
-
-        $sql = "UPDATE promotions SET
-                    title = '$title',
-                    description = '$description',
-                    conditions = '$conditions',
-                    link = '$link',
-                    type = '$type',
-                    is_active = '$is_active'
-                    $image_sql_part
-                WHERE id = '$safe_id'";
-
-    } else { // Добавление
-        $sql = "INSERT INTO promotions (title, description, image, conditions, link, type, is_active, created_at)
-                VALUES ('$title', '$description', '$image_path_in_db', '$conditions', '$link', '$type', '$is_active', NOW())";
-    }
-
-    if (mysqli_query($connect, $sql)) {
-        $_SESSION['message'] = ($action === 'edit') ? "Акция успешно обновлена." : "Акция успешно добавлена.";
-    } else {
-        $_SESSION['message'] = "Ошибка при сохранении акции: " . mysqli_error($connect);
-         // Сохраняем данные для формы при ошибке БД
-        $_SESSION['old_data'] = $old_data;
-        $redirect_url = ($action === 'edit' && $id) ? 'promotion_form.php?id=' . $id : 'promotion_form.php';
-        header('Location: ' . $redirect_url);
-        exit();
-    }
-
-    header('Location: promotions_list.php');
-    exit();
-
-}
-// --- Обработка удаления (POST из формы) ---
-elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_POST['id'])) {
-    $id = (int)$_POST['id'];
-    $safe_id = mysqli_real_escape_string($connect, $id);
-
-    // Получаем путь к картинке
-    $image_path = null;
-    $result_img = mysqli_query($connect, "SELECT image FROM promotions WHERE id = '$safe_id'");
-    if ($row_img = mysqli_fetch_assoc($result_img)) {
-        $image_path = $row_img['image'];
-    }
-
-    // Удаляем запись
-    $sql = "DELETE FROM promotions WHERE id = '$safe_id'";
-    if (mysqli_query($connect, $sql)) {
-        $_SESSION['message'] = "Акция успешно удалена.";
-        // Удаляем файл
-        if ($image_path && file_exists($image_path)) {
-            @unlink($image_path);
+    } elseif ($action === 'delete' && $id) {
+        $stmt_get_img_del = $connect->prepare("SELECT image FROM promotions WHERE id = ?");
+        $image_to_delete = null;
+        if($stmt_get_img_del){
+            $stmt_get_img_del->bind_param("i", $id);
+            $stmt_get_img_del->execute();
+            $res_img_del = $stmt_get_img_del->get_result();
+            if($row_img_del = $res_img_del->fetch_assoc()){
+                $image_to_delete = $row_img_del['image'];
+            }
+            $stmt_get_img_del->close();
         }
-    } else {
-        $_SESSION['message'] = "Ошибка при удалении акции: " . mysqli_error($connect);
+
+        $stmt_delete = $connect->prepare("DELETE FROM promotions WHERE id = ?");
+        if ($stmt_delete) {
+            $stmt_delete->bind_param("i", $id);
+            if ($stmt_delete->execute()) {
+                if ($stmt_delete->affected_rows > 0) {
+                    $_SESSION['admin_message'] = "Акция успешно удалена.";
+                    $_SESSION['admin_message_type'] = "success";
+                    if (!empty($image_to_delete) && file_exists('../' . ltrim($image_to_delete, '/'))) {
+                        unlink('../' . ltrim($image_to_delete, '/'));
+                    }
+                } else {
+                    $_SESSION['admin_message'] = "Акция не найдена или уже удалена.";
+                    $_SESSION['admin_message_type'] = "error";
+                }
+            } else {
+                $_SESSION['admin_message'] = "Ошибка удаления акции: " . $stmt_delete->error;
+                $_SESSION['admin_message_type'] = "error";
+            }
+            $stmt_delete->close();
+        } else {
+             $_SESSION['admin_message'] = "Ошибка подготовки запроса удаления: " . $connect->error;
+             $_SESSION['admin_message_type'] = "error";
+        }
+        header('Location: promotions_list.php');
+        exit();
+
+    } elseif ($action === 'toggle_status' && $id && isset($_POST['current_status'])) {
+        $current_status = (int)$_POST['current_status'];
+        $new_status = $current_status == 1 ? 0 : 1;
+        $stmt_toggle = $connect->prepare("UPDATE promotions SET is_active = ? WHERE id = ?");
+        if($stmt_toggle){
+            $stmt_toggle->bind_param("ii", $new_status, $id);
+            if ($stmt_toggle->execute()) {
+                $_SESSION['admin_message'] = "Статус акции успешно изменен.";
+                $_SESSION['admin_message_type'] = "success";
+            } else {
+                $_SESSION['admin_message'] = "Ошибка изменения статуса: " . $stmt_toggle->error;
+                $_SESSION['admin_message_type'] = "error";
+            }
+            $stmt_toggle->close();
+        } else {
+             $_SESSION['admin_message'] = "Ошибка подготовки запроса изменения статуса: " . $connect->error;
+             $_SESSION['admin_message_type'] = "error";
+        }
+        header('Location: promotions_list.php');
+        exit();
     }
-
-    header('Location: promotions_list.php');
-    exit();
-}
-// --- Обработка переключения статуса (POST из формы) ---
-elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['action']) && $_GET['action'] === 'toggle' && isset($_POST['id'])) {
-     $id = (int)$_POST['id'];
-     $safe_id = mysqli_real_escape_string($connect, $id);
-
-     // Получаем текущий статус
-     $current_status = 0;
-     $result_status = mysqli_query($connect, "SELECT is_active FROM promotions WHERE id = '$safe_id'");
-     if ($row_status = mysqli_fetch_assoc($result_status)) {
-         $current_status = $row_status['is_active'];
-     }
-
-     // Переключаем
-     $new_status = $current_status == 1 ? 0 : 1;
-
-     // Обновляем
-     $sql = "UPDATE promotions SET is_active = '$new_status' WHERE id = '$safe_id'";
-     if (mysqli_query($connect, $sql)) {
-        $_SESSION['message'] = "Статус акции успешно изменен.";
-    } else {
-        $_SESSION['message'] = "Ошибка при изменении статуса: " . mysqli_error($connect);
-    }
-
-     header('Location: promotions_list.php');
-     exit();
 }
 
-// Если действие не распознано
-else {
-    header('Location: promotions_list.php');
-    exit();
-}
-
-mysqli_close($connect); // Закрываем соединение
+$_SESSION['admin_message'] = "Недопустимое действие или отсутствуют параметры.";
+$_SESSION['admin_message_type'] = "error";
+header('Location: promotions_list.php');
+exit();
 ?>
