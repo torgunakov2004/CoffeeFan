@@ -18,6 +18,9 @@ body {
     flex-direction: column;
     min-height: 100vh;
 }
+html {
+    scroll-behavior: smooth;
+  }
 main {
     flex: 1;
 }
@@ -188,7 +191,7 @@ input {
     100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(201, 158, 113, 0); }
 }
 
-/* Header Styles (без изменений) */
+/* Стили шапки */
 #header-section { padding: 32px 0; background-color: #1C1814; position: relative; }
 .header { display: flex; justify-content: space-between; align-items: center; }
 .nav-main { flex-grow: 0.8; display: flex; justify-content: space-between; align-items: center; }
@@ -199,7 +202,7 @@ input {
 .header-action { display: flex; align-items: center; gap: 30px; margin-top: 8px; }
 .profile { position: relative; cursor: pointer; margin-left: 15px; display: flex; align-items: center; height: 42px; }
 .account { display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 50%; background-color: rgba(201, 158, 113, 0.1); transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); border: 2px solid transparent; overflow: hidden; position: relative; z-index: 2; }
-.account img.profile-avatar { width: 100%; height: 100%; object-fit: cover; transition: all 0.3s ease; border-radius: 50%; }
+.account img.profile-avatar { width: 100%; height: 100%; object-fit: cover; transition: all 0.3s ease; border-radius: 50%; } /* Уточнил селектор и добавил border-radius */
 .profile:hover .account { transform: scale(1.1); box-shadow: 0 0 0 3px rgba(201, 158, 113, 0.3); }
 .profile:hover .account img.profile-avatar { transform: scale(1.1); }
 .profile:focus-within .account { border-color: #C99E71; box-shadow: 0 0 0 3px rgba(201, 158, 113, 0.3); }
@@ -282,10 +285,6 @@ input {
 .popular__actions .material-icons-outlined { font-size: 20px; }
 
 /* Menu Section Styles */
-#menu-section {
-    /* background-color: #14110E; */ /* Уже есть у body, можно убрать, если нет специфичного фона для этой секции */
-    /* padding: 100px 0; */ /* Отступы уже есть у .section-main */
-}
 .menu-wrap {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Можно уменьшить minmax до 220px или 200px, если карточек будет много и они станут слишком широкими */
@@ -348,7 +347,107 @@ input {
     color: #FFFFFF;
     margin-top: auto; /* Прижимает цену к низу, если контент не занимает всю высоту */
 }
+.cafe-menu-location-info {
+    text-align: center;
+    padding: 35px 20px;
+    margin-top: 50px;
+    margin-bottom: 0;
+    background: linear-gradient(145deg, #201d1a, #1a1714);
+    border-top: 1px solid #383028;
+    border-bottom: 1px solid #383028;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2),
+                inset 0 1px 2px rgba(201, 158, 113, 0.05);
+    position: relative;
+    overflow: hidden;
+}
 
+.cafe-menu-location-info::before {
+    content: "\e55e";
+    font-family: 'Material Icons Outlined';
+    font-size: 48px;
+    color: #C99E71;
+    opacity: 0.15;
+    position: absolute;
+    top: 50%;
+    left: 40px;
+    transform: translateY(-50%) rotate(-15deg);
+    z-index: 0;
+    pointer-events: none;
+}
+
+.cafe-menu-location-info::after {
+    content: "\e55e";
+    font-family: 'Material Icons Outlined';
+    font-size: 48px;
+    color: #C99E71;
+    opacity: 0.15;
+    position: absolute;
+    top: 50%;
+    right: 40px;
+    transform: translateY(-50%) rotate(15deg);
+    z-index: 0;
+    pointer-events: none;
+}
+
+.cafe-menu-location-info p {
+    font-size: 1.15em;
+    line-height: 1.75;
+    color: #e0e0e0;
+    margin: 0;
+    position: relative;
+    z-index: 1;
+}
+
+.cafe-menu-location-info .highlighted-link {
+    color: #C99E71;
+    font-weight: 700;
+    text-decoration: none;
+    border-bottom: 2px dotted rgba(201, 158, 113, 0.5);
+    padding-bottom: 2px;
+    transition: color 0.3s ease, border-bottom-color 0.3s ease, border-bottom-style 0.3s ease;
+}
+
+.cafe-menu-location-info .highlighted-link:hover,
+.cafe-menu-location-info .highlighted-link:focus {
+    color: #FFFFFF;
+    border-bottom-color: #FFFFFF;
+    border-bottom-style: solid;
+    outline: none;
+}
+
+@media (max-width: 768px) {
+    .cafe-menu-location-info {
+        margin-top: 40px;
+        padding: 30px 15px;
+    }
+    .cafe-menu-location-info::before,
+    .cafe-menu-location-info::after {
+        font-size: 36px;
+        opacity: 0.1;
+    }
+    .cafe-menu-location-info::before {
+        left: 20px;
+    }
+    .cafe-menu-location-info::after {
+        right: 20px;
+    }
+    .cafe-menu-location-info p {
+        font-size: 1.05em;
+    }
+}
+
+@media (max-width: 480px) {
+    .cafe-menu-location-info::before,
+    .cafe-menu-location-info::after {
+        display: none;
+    }
+    .cafe-menu-location-info p {
+        font-size: 1em;
+    }
+    .cafe-menu-location-info {
+        padding: 25px 15px;
+    }
+}
 /* Styles for Load More Button Container */
 .load-more-container {
     text-align: center;

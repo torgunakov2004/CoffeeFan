@@ -32,6 +32,7 @@
     <title>CoffeeeFan - Рецепты</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Icons+Outlined">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -75,10 +76,10 @@
                         <button class="header-action__cart-1 material-icons-outlined <?php echo $has_items_in_cart ? 'active' : ''; ?>" title="Корзина">shopping_cart</button>
                     </a>
                     <nav class="profile">
-                    <nav class="account">
-                        <img src="<?php echo $_SESSION['user']['avatar'] ?? '../img/icons8.png'; ?>" class="profile-avatar" alt="Аватар профиля">
-                    </nav>
-                        <?php if (!$_SESSION): ?>
+                        <nav class="account">
+                            <img src="<?php echo $_SESSION['user']['avatar'] ?? '../img/icons8.png'; ?>" class="profile-avatar" alt="Аватар профиля">
+                        </nav>
+                        <?php if (!isset($_SESSION['user'])): ?>
                             <ul class="submenu">
                                 <li><a class="log" href="../auth/authorization.php">Вход</a></li>
                                 <li><a class="log" href="../auth/register.php">Регистрация</a></li>
@@ -86,11 +87,11 @@
                         <?php else: ?>
                             <ul class="submenu">
                                 <li class="user-info">
-                                <div class="user-avatar">
-                                    <img src="<?php echo $_SESSION['user']['avatar'] ?? '../img/default-avatar.jpg'; ?>" alt="Аватар">
-                                </div>
+                                    <div class="user-avatar">
+                                        <img src="<?php echo $_SESSION['user']['avatar'] ?? '../img/default-avatar.jpg'; ?>" alt="Аватар">
+                                    </div>
                                     <div class="user-details">
-                                    <span class="user-name"><?= htmlspecialchars($_SESSION["user"]['first_name'] ?? ($_SESSION["user"]['name'] ?? 'Пользователь')) ?></span>
+                                        <span class="user-name"><?= htmlspecialchars($_SESSION["user"]['first_name'] ?? ($_SESSION["user"]['name'] ?? 'Пользователь')) ?></span>
                                         <span class="user-email"><?= htmlspecialchars($_SESSION["user"]['email']) ?></span>
                                     </div>
                                 </li>
@@ -160,30 +161,7 @@
 
         </div>
     </main>
-
-    <footer id="footer-section">
-         <div class="container">
-             <div class="footer">
-                 <img class="footer__img" src="../img/logo.svg" alt="CoffeeeFan Logo">
-                 <ul class="footer__list">
-                     <li class="footer__item"><a class="footer__link" href="../index.php">Главная</a></li>
-                     <li class="footer__item"><a class="footer__link" href="#">Рецепты</a></li> <!-- Текущая страница -->
-                     <li class="footer__item"><a class="footer__link" href="../Продукты/index.php">Продукты</a></li>
-                     <?php /* <li class="footer__item"><a class="footer__link" href="../Меню/index.php">Меню</a></li> Ссылки на меню не было в вашем исходном футере продуктов */ ?>
-                     <li class="footer__item"><a class="footer__link" href="../Акции/index.php">Акции</a></li>
-                     <li class="footer__item"><a class="footer__link" href="../О кофе/index.php">О кофе</a></li>
-                     <li class="footer__item"><a class="footer__link" href="../Новости/index.php">Новости</a></li>
-                     <li class="footer__item"><a class="footer__link" href="../Контакты/index.php">Контакты</a></li>
-                 </ul>
-             </div>
-         </div>
-         <div class="footer-copyright">
-             <div class="container">
-                 <p class="footer-copyright__text">CoffeeeFan © 2024. Все права защищены</p>
-             </div>
-         </div>
-     </footer>
-
+    <?php include_once '../footer.php'; ?>    
     <script>
         $(document).ready(function() {
             $('.save-recipe-btn').on('click', function(e) {

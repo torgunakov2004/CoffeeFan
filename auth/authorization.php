@@ -1,39 +1,48 @@
 <?php
     session_start();
-
-    if (!empty($_SESSION["user"])) {
+    if (isset($_SESSION["user"]) && !empty($_SESSION["user"])) { // Более строгая проверка
         header("Location: ../index.php");
+        exit(); 
     }
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru"> 
 <head>
     <meta charset="UTF-8">
-    <title>ExoProduct|Регистрация</title>
-    <link rel="stylesheet" href="../auth.css?<?echo time();?>">
-    <link rel="stylesheet" href="../style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Добавлен viewport для адаптивности -->
+    <title>CoffeeeFan | Авторизация</title> <!-- Изменено название -->
+    <link rel="stylesheet" href="auth_style.css?<?php echo time();?>"> <!-- Путь к новому CSS -->
 </head>
 <body>
-    <header>
-    </header>
-    <main class="cab">
+    <div class="auth-container">
+        <img src="../img/logo.svg" alt="CoffeeeFan Logo" class="auth-logo"> <!-- Логотип -->
+        <h1 class="auth-title">Авторизация</h1>
+
         <form action="../config/singin.php" method="post">
-            <label>Логин</label>
-            <input type="text" name="login" placeholder="Введите логин">
-            <label>Пароль</label>
-            <input type="password" name="password" placeholder="Введите пароль">
+            <div> <!-- Обертка для label + input -->
+                <label for="login">Логин</label>
+                <input type="text" id="login" name="login" placeholder="Введите ваш логин" required> <!-- Добавлен required и id -->
+            </div>
+
+            <div> <!-- Обертка для label + input -->
+                <label for="password">Пароль</label>
+                <input type="password" id="password" name="password" placeholder="Введите ваш пароль" required> <!-- Добавлен required и id -->
+            </div>
+
+            <?php
+                if (isset($_SESSION['message']) && !empty($_SESSION['message'])) { // Проверка на существование и непустоту
+                    // Предполагаем, что сообщение об ошибке
+                    echo '<p class="msg error"> ' . htmlspecialchars($_SESSION['message']) . ' </p>'; // Добавлен htmlspecialchars
+                    unset($_SESSION['message']);
+                }
+             ?>
+
             <button type="submit">Войти</button>
             <p>
-                У вас нет аккаунта? - <a href="register.php">зарегиструйтесь</a>!
+                У вас нет аккаунта? - <a href="register.php">Зарегистрируйтесь!</a>
             </p>
-            <?php 
-                if (!empty($_SESSION['message'])) {
-                    echo '<p class="msg"> ' . $_SESSION['message'] . ' </p>';
-                }
-                unset($_SESSION['message']);
-             ?>
         </form>
-    </main>
+    </div>
 </body>
 </html>

@@ -32,6 +32,8 @@ while ($row = $result->fetch_assoc()) {
     <link rel="stylesheet" href="styles.css">     
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Icons+Outlined">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">    
 </head>
 <body>
     <header id="header-section">
@@ -57,29 +59,28 @@ while ($row = $result->fetch_assoc()) {
                     </a>
                     <nav class="profile">
                         <nav class="account">
-                            <img src="<?php echo $_SESSION['user']['avatar'] ?? '../img/icons8.png'; ?>" class="profile-avatar" alt="Аватар профиля">
+                             <img src="<?php echo htmlspecialchars($_SESSION['user']['avatar'] ?? 'img/icons8.png'); ?>" class="profile-avatar">
                         </nav>
-                            <?php if (!$_SESSION): ?>
-                                <ul class="submenu">
-                                    <li><a class="log" href="auth/authorization.php">Вход</a></li>
-                                    <li><a class="log" href="auth/register.php">Регистрация</a></li>
-                                </ul>
-                            <?php else: ?>
-                                <ul class="submenu">
-                                    <li class="user-info">
+                        <?php if (!isset($_SESSION['user'])): ?>
+                            <ul class="submenu">
+                                <li><a class="log" href="auth/authorization.php">Вход</a></li>
+                                <li><a class="log" href="auth/register.php">Регистрация</a></li>
+                            </ul>
+                        <?php else: ?>
+                            <ul class="submenu">
+                                <li class="user-info">
                                     <div class="user-avatar">
-                                        <img src="<?php echo $_SESSION['user']['avatar'] ?? '../img/default-avatar.jpg'; ?>" alt="Аватар">
+                                        <img src="<?php echo htmlspecialchars($_SESSION['user']['avatar'] ?? 'img/default-avatar.jpg'); ?>" alt="Аватар">
                                     </div>
-                                        <div class="user-details">
-                                        <span class="user-name"><?= htmlspecialchars($_SESSION["user"]['first_name'] ?? ($_SESSION["user"]['name'] ?? 'Пользователь')) ?></span>
-                                            <span class="user-email"><?= htmlspecialchars($_SESSION["user"]['email']) ?></span>
-                                        </div>
+                                    <div class="user-details">
+                                        <span class="user-name"><?= htmlspecialchars($_SESSION["user"]['name'] ?? ($_SESSION["user"]['first_name'] ?? 'Пользователь')) ?></span>
+                                        <span class="user-email"><?= htmlspecialchars($_SESSION["user"]['email'] ?? '') ?></span>
+                                    </div>
                                 </li>
                                 <li class="menu-divider"></li>
                                 <li><a class="menu-item" href="profile.php"><i class="icon-user"></i>Мой профиль</a></li>
                                 <li><a class="menu-item" href="orders.php"><i class="icon-orders"></i>Мои заказы</a></li>
                                 <li><a class="menu-item" href="favorites.php"><i class="icon-heart"></i>Избранное</a></li>
-                                <?php if (isset($_SESSION['user']['is_admin']) && $_SESSION['user']['is_admin']): ?>
                                 <?php
                                 $isAdmin = false;
                                 if (isset($_SESSION['admin']) && $_SESSION['admin']) $isAdmin = true;
@@ -154,16 +155,7 @@ while ($row = $result->fetch_assoc()) {
         </div>
     </div>
 
-    <footer id="footer-section">
-        <div class="container">
-            <div class="footer"></div>
-        </div>
-        <div class="footer-copyright">
-            <div class="container">
-                <p class="footer-copyright__text">CoffeeeFan © <?= date('Y') ?>. Все права защищены</p>
-            </div>
-        </div>
-    </footer>
+    <?php include_once 'footer.php'; ?>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
@@ -332,6 +324,7 @@ while ($row = $result->fetch_assoc()) {
                     }
                 });
             });
+            // +++++ КОНЕЦ НОВОГО КОДА +++++
         });
     </script>
 </body>

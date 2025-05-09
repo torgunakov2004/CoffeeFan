@@ -13,55 +13,75 @@ if (!$tests) {
     die("Ошибка выполнения запроса: " . mysqli_error($connect));
 }
 
-// Обработка отправки отзыва
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit_review'])) {
-    $name = isset($_SESSION['user']) ? $_SESSION['user']['name'] : htmlspecialchars(trim($_POST['name']));
-    $review = htmlspecialchars(trim($_POST['review']));
+// Обработка отправки отзыва (ОСТАЕТСЯ БЕЗ ИЗМЕНЕНИЙ)
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit_review_form_token'])) { // Используем новое имя для токена формы
+    // Проверка CSRF токена
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        $_SESSION['error'] = "Ошибка безопасности: неверный CSRF токен.";
+        header('Location: index.php');
+        exit();
+    }
+
+    $name = '';
+    $user_id_for_review = null;
+
+    if (isset($_SESSION['user'])) {
+        $name = $_SESSION['user']['first_name'] ?? $_SESSION['user']['name']; // Приоритет first_name
+        $user_id_for_review = $_SESSION['user']['id'];
+    } else {
+        $name = htmlspecialchars(trim($_POST['name']));
+    }
+    
+    $review_text = htmlspecialchars(trim($_POST['review'])); // Переименовал переменную во избежание конфликта
     $rating = isset($_POST['rating']) ? intval($_POST['rating']) : 0;
 
-    if (!empty($name) && !empty($review)) {
-        $stmt = $connect->prepare("INSERT INTO `reviews` (`name`, `review`, `rating`, `status`) VALUES (?, ?, ?, 'pending')");
-        $stmt->bind_param("ssi", $name, $review, $rating);
+    if (!empty($name) && !empty($review_text)) {
+        $stmt = $connect->prepare("INSERT INTO `reviews` (`name`, `review`, `rating`, `status`, `user_id`) VALUES (?, ?, ?, 'pending', ?)");
+        $stmt->bind_param("ssii", $name, $review_text, $rating, $user_id_for_review);
 
         if ($stmt->execute()) {
             $_SESSION['message'] = "Отзыв успешно отправлен на модерацию!";
         } else {
             $_SESSION['error'] = "Ошибка при отправке отзыва: " . $stmt->error;
         }
-
         $stmt->close();
     } else {
         $_SESSION['error'] = "Пожалуйста, заполните все поля.";
     }
 
-    header('Location: index.php');
+    unset($_SESSION['csrf_token']); // Удаляем токен после использования
+    header('Location: index.php#reviews-section'); // Перенаправляем к секции отзывов
     exit();
 }
 
+// Генерация CSRF токена для формы отзыва
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
+
 // Получение всех одобренных отзывов
-$reviews_query_sql = "
-    SELECT r.*, u.avatar as user_true_avatar 
-    FROM `reviews` r
-    LEFT JOIN `user` u ON r.user_id = u.id
-    WHERE r.status = 'approved' 
-    ORDER BY r.id DESC
-";
-$reviews = mysqli_query($connect, $reviews_query_sql);
-if (!$reviews) {
+$reviews_query_result = mysqli_query($connect, "SELECT r.*, u.avatar as user_avatar_path FROM `reviews` r LEFT JOIN `user` u ON r.user_id = u.id WHERE r.`status` = 'approved' ORDER BY r.`id` DESC");
+if (!$reviews_query_result) {
     die("Ошибка выполнения запроса отзывов: " . mysqli_error($connect));
 }
 
     // Получаем количество товаров в корзине для текущего пользователя
     $cart_quantities = [];
-    if (isset($_SESSION['user'])) {
+    if (isset($_SESSION['user']['id'])) { // Проверяем наличие user ID
         $user_id = $_SESSION['user']['id'];
-        $query = "SELECT product_id, quantity FROM cart WHERE user_id = ?";
-        $stmt = $connect->prepare($query);
-        $stmt->bind_param("i", $user_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        while ($row = $result->fetch_assoc()) {
-            $cart_quantities[$row['product_id']] = $row['quantity'];
+        $query_cart = "SELECT product_id, quantity FROM cart WHERE user_id = ?";
+        $stmt_cart = $connect->prepare($query_cart);
+        if ($stmt_cart) {
+            $stmt_cart->bind_param("i", $user_id);
+            $stmt_cart->execute();
+            $result_cart = $stmt_cart->get_result();
+            while ($row_cart = $result_cart->fetch_assoc()) {
+                $cart_quantities[$row_cart['product_id']] = $row_cart['quantity'];
+            }
+            $stmt_cart->close();
+        } else {
+            error_log("Ошибка подготовки запроса корзины на странице О кофе: " . $connect->error);
         }
     }
 
@@ -69,16 +89,17 @@ if (!$reviews) {
     $has_items_in_cart = !empty($cart_quantities);
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>CoffeFan</title>
+    <title>CoffeFan - О кофе</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Icons+Outlined">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="/menu_style.css">
+    <!-- <link rel="stylesheet" href="/menu_style.css"> Убрал, если это для общего меню, оно уже в style.css -->
 </head>
 <body>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -98,15 +119,14 @@ if (!$reviews) {
                         <li class="nav-main__item">
                             <a class="nav-main__link" href="../Рецепты/index.php">Рецепты</a>
                         </li>
-
                         <li class="nav-main__item">
-                        <a class="nav-main__link" href="../Акции/index.php">Акции</a>
+                            <a class="nav-main__link" href="../Акции/index.php">Акции</a>
                         </li>
                     </ul>
-                    <img class="header__logo" src="../img/logo.svg" alt="#">
+                        <img class="header__logo" src="../img/logo.svg" alt="Логотип CoffeeFan">
                     <ul class="nav-main__list">
                         <li class="nav-main__item">
-                            <a class="nav-main__link nav-main__link_selected" href="../О кофе/index.php">О кофе</a>
+                            <a class="nav-main__link nav-main__link_selected" href="#">О кофе</a>
                         </li>
                         <li class="nav-main__item">
                             <a class="nav-main__link" href="../Новости/index.php">Новости</a>
@@ -118,13 +138,13 @@ if (!$reviews) {
                 </nav>
                 <div class="header-action">
                 <a href="../local_mall.php">
-                    <button class="header-action__cart-1 material-icons-outlined <?php echo $has_items_in_cart ? 'active' : ''; ?>">shopping_cart</button>
+                    <button class="header-action__cart-1 material-icons-outlined <?php echo $has_items_in_cart ? 'active' : ''; ?>" title="Корзина">shopping_cart</button>
                 </a>
                 <nav class="profile">
-                    <nav class="account">
-                        <img src="<?php echo $_SESSION['user']['avatar'] ?? '../img/icons8.png'; ?>" class="profile-avatar" alt="Аватар профиля">
-                    </nav>
-                        <?php if (!$_SESSION): ?>
+                        <nav class="account">
+                             <img src="<?php echo isset($_SESSION['user']['avatar']) ? htmlspecialchars($_SESSION['user']['avatar']) : '../img/icons8.png'; ?>" class="profile-avatar" alt="Аватар профиля">
+                        </nav>
+                        <?php if (!isset($_SESSION['user'])): ?>
                             <ul class="submenu">
                                 <li><a class="log" href="../auth/authorization.php">Вход</a></li>
                                 <li><a class="log" href="../auth/register.php">Регистрация</a></li>
@@ -132,18 +152,18 @@ if (!$reviews) {
                         <?php else: ?>
                             <ul class="submenu">
                                 <li class="user-info">
-                                <div class="user-avatar">
-                                    <img src="<?php echo $_SESSION['user']['avatar'] ?? '../img/default-avatar.jpg'; ?>" alt="Аватар">
-                                </div>
+                                    <div class="user-avatar">
+                                        <img src="<?php echo htmlspecialchars($_SESSION['user']['avatar'] ?? '../img/default-avatar.jpg'); ?>" alt="Аватар">
+                                    </div>
                                     <div class="user-details">
-                                    <span class="user-name"><?= htmlspecialchars($_SESSION["user"]['first_name'] ?? ($_SESSION["user"]['name'] ?? 'Пользователь')) ?></span>
+                                        <span class="user-name"><?= htmlspecialchars($_SESSION["user"]['first_name'] ?? ($_SESSION["user"]['name'] ?? 'Пользователь')) ?></span>
                                         <span class="user-email"><?= htmlspecialchars($_SESSION["user"]['email']) ?></span>
                                     </div>
                                 </li>
                                 <li class="menu-divider"></li>
-                                <li><a class="menu-item" href="profile.php"><i class="icon-user"></i>Мой профиль</a></li>
-                                <li><a class="menu-item" href="orders.php"><i class="icon-orders"></i>Мои заказы</a></li>
-                                <li><a class="menu-item" href="favorites.php"><i class="icon-heart"></i>Избранное</a></li>
+                                <li><a class="menu-item" href="../profile.php"><i class="icon-user"></i>Мой профиль</a></li>
+                                <li><a class="menu-item" href="../orders.php"><i class="icon-orders"></i>Мои заказы</a></li>
+                                <li><a class="menu-item" href="../favorites.php"><i class="icon-heart"></i>Избранное</a></li>
                                 <?php if (isset($_SESSION['user']['is_admin']) && $_SESSION['user']['is_admin']): ?>
                                     <li class="menu-divider"></li>
                                     <li><a class="menu-item admin" href="../admin/admin_dashboard.php"><i class="icon-admin"></i>Админ-панель</a></li>
@@ -199,61 +219,89 @@ if (!$reviews) {
             </section>
 
             <!-- Отзывы -->
-            <h3 class="section-subtitle">Отзывы</h3>
-            <?php if (isset($_SESSION['message'])): ?>
-                <div class="alert alert-success"><?php echo $_SESSION['message']; unset($_SESSION['message']); ?></div>
-            <?php endif; ?>
-            <?php if (isset($_SESSION['error'])): ?>
-                <div class="alert alert-error"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></div>
-            <?php endif; ?>
-
-            <!-- Форма отправки отзыва -->
-            <form id="review-form" class="review-form">
-                <?php if (!isset($_SESSION['user'])): ?>
-                    <input type="text" name="name" placeholder="Ваше имя" required>
-                <?php else: ?>
-                    <input type="hidden" name="name" value="<?= htmlspecialchars($_SESSION['user']['name']) ?>">
+            <section id="reviews-section" class="section-main"> <!-- Добавил section-main для консистентности -->
+                <h3 class="section-subtitle">Отзывы наших клиентов</h3>
+                <?php if (isset($_SESSION['message'])): ?>
+                    <script>
+                        $(document).ready(function() {
+                            toastr.success('<?php echo $_SESSION['message']; ?>');
+                        });
+                    </script>
+                    <?php unset($_SESSION['message']); ?>
                 <?php endif; ?>
-                
-                <textarea name="review" placeholder="Ваш отзыв" required></textarea>
-                
-                <?php if (isset($_SESSION['user'])): ?>
+                <?php if (isset($_SESSION['error'])): ?>
+                     <script>
+                        $(document).ready(function() {
+                            toastr.error('<?php echo $_SESSION['error']; ?>');
+                        });
+                    </script>
+                    <?php unset($_SESSION['error']); ?>
+                <?php endif; ?>
+
+                <!-- Форма отправки отзыва -->
+                <form id="review-form" class="review-form" method="POST" action="index.php#reviews-section">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token']); ?>">
+                    
+                    <textarea name="review" placeholder="Ваш отзыв (минимум 10 символов)" required minlength="10"></textarea>
+                    
                     <div class="rating">
-                        <p>Оцените продукт:</p>
+                        <p>Оцените наш сервис (необязательно):</p>
                         <div class="stars">
-                            <?php for ($i = 1; $i <= 5; $i++): ?>
+                            <?php for ($i = 5; $i >= 1; $i--): // Обратный порядок для CSS трюка с ~ ?>
                                 <input type="radio" id="star<?= $i ?>" name="rating" value="<?= $i ?>">
-                                <label for="star<?= $i ?>">&#9733;</label>
+                                <label for="star<?= $i ?>">★</label>
                             <?php endfor; ?>
                         </div>
                     </div>
-                <?php endif; ?>
+                    <button type="submit" name="submit_review_form_token" class="btn-primary">Отправить отзыв</button>
+                </form>
 
-                <button type="submit" class="btn-primary">Отправить отзыв</button>
-            </form>
-
-            <!-- Секция отзывов -->
-            <section id="testimonial-section" class="section-main testimonial-carousel"> <?php // Используем классы со страницы Продукты ?>
-                <div class="testimonial-wrap"> <?php // Используем классы со страницы Продукты ?>
-                    <?php if ($reviews && mysqli_num_rows($reviews) > 0): ?>
-                        <?php while ($review = mysqli_fetch_assoc($reviews)): ?>
-                            <div class="testimonial">
+                <!-- Секция отображения отзывов -->
+                <div class="testimonial-wrap-column"> <?php // Новый класс для вертикального расположения ?>
+                    <?php if ($reviews_query_result && mysqli_num_rows($reviews_query_result) > 0): ?>
+                        <?php while ($review = mysqli_fetch_assoc($reviews_query_result)): ?>
+                            <div class="testimonial"> <?php // Используем класс .testimonial со страницы Продукты ?>
                                 <div class="testimonial-data">
                                     <?php
-                                        $avatar_to_display = $review['user_true_avatar'] ?? '../img/testimonial-1.jpg'; // Аватар пользователя или дефолтный
-                                        // Если $review['user_true_avatar'] это NULL или пустая строка, будет использован дефолтный
-                                        if (empty($review['user_true_avatar'])) {
-                                            $avatar_to_display = '../img/testimonial-1.jpg'; // Явное указание дефолтного, если из БД пусто
+                                    $avatar_path = '../img/default-avatar-review.png'; // Дефолтный аватар для отзывов
+                                    if (!empty($review['user_avatar_path']) && file_exists('..' . $review['user_avatar_path'])) {
+                                        // Если есть аватар пользователя и он существует
+                                        // (нужно убрать /uploads, если путь уже ../uploads/...)
+                                        // Предполагаем, что user_avatar_path хранится как /uploads/avatars/file.jpg
+                                        // или uploads/avatars/file.jpg
+                                        $corrected_avatar_path = $review['user_avatar_path'];
+                                        if (strpos($corrected_avatar_path, '../') !== 0) {
+                                             // если путь не начинается с ../, то добавляем
+                                            if ($corrected_avatar_path[0] === '/') {
+                                                $corrected_avatar_path = '..' . $corrected_avatar_path;
+                                            } else {
+                                                $corrected_avatar_path = '../' . $corrected_avatar_path;
+                                            }
                                         }
+                                         if(file_exists($corrected_avatar_path)){
+                                            $avatar_path = htmlspecialchars($corrected_avatar_path);
+                                         } else {
+                                            // Файл аватара не найден, используем первую букву имени
+                                            echo '<div class="testimonial__img_initials">' . htmlspecialchars(mb_strtoupper(mb_substr($review['name'], 0, 1, 'UTF-8'))) . '</div>';
+                                            $avatar_path = null; // Флаг, что изображение не нужно выводить
+                                         }
+                                    } else {
+                                        // Аватара нет или не найден, используем первую букву имени
+                                        echo '<div class="testimonial__img_initials">' . htmlspecialchars(mb_strtoupper(mb_substr($review['name'], 0, 1, 'UTF-8'))) . '</div>';
+                                        $avatar_path = null; // Флаг, что изображение не нужно выводить
+                                    }
                                     ?>
-                                    <img class="testimonial__img" src="<?php echo htmlspecialchars($avatar_to_display); ?>" alt="Аватар пользователя <?php echo htmlspecialchars($review['name']); ?>">
-                                    <div>
+                                    <?php if ($avatar_path): ?>
+                                        <img class="testimonial__img" src="<?php echo $avatar_path; ?>" alt="Аватар <?php echo htmlspecialchars($review['name']); ?>">
+                                    <?php endif; ?>
+
+                                    <div> <?php // Обёртка для имени и текста отзыва ?>
                                         <h3 class="testimonial__name"><?php echo htmlspecialchars($review['name']); ?></h3>
-                                        <p class="testimonial__text section__text"><?php echo htmlspecialchars($review['review']); ?></p>
+                                        <p class="testimonial__text section__text"><?php echo nl2br(htmlspecialchars($review['review'])); ?></p>
                                         <?php if (isset($review['rating']) && $review['rating'] > 0): ?>
-                                            <div class="review-rating-testimonial">
-                                                <?php for ($s = 1; $s <= 5; $s++): ?>
-                                                    <span class="star-testimonial <?= ($s <= $review['rating']) ? 'filled' : '' ?>">★</span>
+                                            <div class="testimonial__rating">
+                                                <?php for ($i = 1; $i <= 5; $i++): ?>
+                                                    <span class="star <?php echo ($i <= $review['rating']) ? 'filled' : ''; ?>">★</span>
                                                 <?php endfor; ?>
                                             </div>
                                         <?php endif; ?>
@@ -262,28 +310,15 @@ if (!$reviews) {
                             </div>
                         <?php endwhile; ?>
                     <?php else: ?>
-                        <p class="no-products-message">Отзывов пока нет.</p> <?php // или другой класс, если нужно ?>
+                        <p class="no-reviews-message">Отзывов пока нет. Будьте первым!</p>
                     <?php endif; ?>
                 </div>
             </section>
         </div>
     </main>
-
-    <footer id="footer-section">
-        <div class="container">
-            <div class="footer">
-  
-            </div>
-        </div>
-        <div class="footer-copyright">
-            <div class="container">
-                <p class="footer-copyright__text">e-Wiwonti © 2025. Все права защищены</p>
-            </div>
-        </div>
-    </footer>
-
+    <?php include_once '../footer.php'; ?>
     <script>
-        // Данные для диаграмм
+        // Данные для диаграмм (ОСТАЮТСЯ БЕЗ ИЗМЕНЕНИЙ)
         const chartsData = [
             {
                 labels: ['Снижение риска диабета', 'Улучшение памяти', 'Снижение риска инсульта', 'Антиоксиданты'],
@@ -313,27 +348,27 @@ if (!$reviews) {
                 labels: ['Уровень энергии', 'Концентрация', 'Качество сна', 'Уровень тревожности'],
                 datasets: [{
                     label: 'Влияние кофе на организм',
-                    data: [70, 60, 30, 50],
+                    data: [70, 60, 30, 50], // Примерные данные
                     backgroundColor: ['#6a994e', '#ffb703', '#fb8500', '#d00000'],
                 }]
             }
         ];
 
-        // Создание диаграмм
+        // Создание диаграмм (ОСТАЮТСЯ БЕЗ ИЗМЕНЕНИЙ)
         chartsData.forEach((data, index) => {
             const ctx = document.getElementById(`chart-${index + 1}`).getContext('2d');
-            const chartType = index === 3 ? 'bar' : 'doughnut'; // Для последней диаграммы используем столбчатую диаграмму
+            const chartType = index === 3 ? 'bar' : 'doughnut';
             new Chart(ctx, {
                 type: chartType,
                 data: data,
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false, // Отключаем автоматическое поддержание пропорций
+                    maintainAspectRatio: false,
                     plugins: {
                         legend: {
                             labels: {
                                 font: {
-                                    size: 20,
+                                    size: 14, // Уменьшил для лучшего вида на мобильных
                                     family: 'Urbanist',
                                 },
                                 color: '#FFFFFF'
@@ -344,38 +379,27 @@ if (!$reviews) {
             });
         });
 
-        $(document).ready(function() {
-            // Обработка отправки отзыва
-            $('#review-form').on('submit', function(e) {
-                e.preventDefault(); // Предотвращаем стандартную отправку формы
-                
-                $.ajax({
-                    type: 'POST',
-                    url: 'submit_review.php', // Файл-обработчик
-                    data: $(this).serialize(), // Сериализуем данные формы
-                    dataType: 'json',
-                    success: function(response) {
-                        if (response.status === 'success') {
-                            // Показываем уведомление об успехе
-                            toastr.success(response.message);
-                            
-                            // Очищаем форму
-                            $('#review-form')[0].reset();
-                            
-                            // Если нужно обновить список отзывов
-                            // loadReviews();
-                        } else {
-                            // Показываем ошибку
-                            toastr.error(response.message);
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        toastr.error('Произошла ошибка при отправке отзыва');
-                        console.error(error);
-                    }
-                });
-            });
-        });
+        // Настройка Toastr (ОСТАЕТСЯ БЕЗ ИЗМЕНЕНИЙ)
+        toastr.options = {
+            "closeButton": true,
+            "debug": false,
+            "newestOnTop": true,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "preventDuplicates": true,
+            "onclick": null,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "5000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
+        
+        // AJAX для формы отзыва не нужен, т.к. форма теперь отправляется стандартно.
+        // PHP обработчик вверху файла index.php сам установит сессионные сообщения для toastr.
     </script>
 </body>
 </html>

@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Righteous&family=Urbanist:wght@500;600&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Material+Icons+Outlined');
 
+/* base-styles */
 * {
     margin: 0;
     padding: 0;
@@ -20,6 +21,7 @@ body {
 }
 main {
     flex: 1;
+    margin-bottom: 70px;
 }
 a {
     color: inherit;
@@ -44,10 +46,23 @@ button {
     transition: .4s;
     cursor: pointer;
 }
-/* Общий стиль для input УБРАН, т.к. для поиска он будет специфичнее */
-/* input { ... } */
+input {
+    display: block;
+    padding: 12px 15px;
+    border: 1px solid #333;
+    outline: none;
+    color: #FFFFFF;
+    font: 500 16px 'Urbanist', Arial, Helvetica, sans-serif;
+    background-color: #1C1814;
+    border-radius: 6px;
+    width: 100%;
+    transition: border-color 0.3s ease;
+}
+input:focus {
+    border-color: #C99E71;
+}
 
-
+/* utilities-layout */
 .btn-primary {
     padding: 12px 25px;
     font: 700 16px 'Inter', Arial, Helvetica, sans-serif;
@@ -56,7 +71,10 @@ button {
     color: #14110E;
     border-radius: 6px;
     transition: background-color 0.3s ease, transform 0.2s ease;
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     cursor: pointer;
     border: none;
     text-decoration: none;
@@ -65,54 +83,40 @@ button {
     background-color: #bd864b;
     transform: translateY(-2px);
 }
-.btn-danger { /* Этот класс не используется на странице рецептов, но оставлю на всякий случай */
-    background-color: #ff4d4d;
-    color: #FFFFFF;
-    padding: 8px 12px;
-    border-radius: 6px;
-    font: 600 14px 'Urbanist', Arial, Helvetica, sans-serif;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    cursor: pointer;
-}
-.btn-danger:hover {
-    background-color: #e60000;
-    transform: scale(1.05);
-}
 .container {
     max-width: 1340px;
     margin: 0 auto;
     padding: 0 75px;
+    position: relative; /* Added for absolute positioning of back button */
 }
 .container-header {
     padding: 0 10px;
+    position: static; /* Override relative positioning for header container */
 }
-.section-main { /* Этот класс не используется на странице рецептов в main, но может быть в других */
-    padding-bottom: 70px;
+.section-main {
+    padding-top: 50px;
 }
-.section-title { /* Не используется */
+.section-title {
     margin-bottom: 12px;
     color: #C99E71;
     font: 600 18px/22px 'Urbanist', Arial, Helvetica, sans-serif;
     text-align: center;
 }
-.section-subtitle { /* Используется для заголовка "Вкусные идеи..." */
+.section-subtitle { /* Used for page titles like "Recipes" and "My Recipes" */
     font-family: 'Urbanist', Arial, Helvetica, sans-serif;
     font-size: 32px;
     line-height: 1.4;
     font-weight: 600;
     color: #FFFFFF;
     text-align: center;
-    padding-top: 50px; /* Отступ сверху */
-    margin-bottom: 40px; /* Отступ до строки поиска/кнопки */
+    padding-top: 50px; /* Top space for the back button to potentially overlay */
+    margin-top: 0;     /* Reset margin-top */
+    margin-bottom: 40px;
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-  }
+}
 .section-subtitle::before,
 .section-subtitle::after {
     content: '';
@@ -120,20 +124,39 @@ button {
     height: 1px;
     background-color: #444;
     margin: 0 20px;
-  }
-h2.section-title__h2 { /* Не используется */
+}
+h2.section-title__h2 {
     margin-top: 50px;
     margin-bottom: 15px;
     font: 600 24px 'Urbanist', Arial, Helvetica, sans-serif;
     color: #C99E71;
     text-align: center;
 }
-.section__text { /* Не используется явно, но может быть в .content карточек */
-    opacity: 0.8;
-    line-height: 1.6;
+
+
+.page-header__back-button-textual {
+    position: absolute;
+    top: 40px; /* Match .section-subtitle padding-top */
+    left: 75px; /* Match .container padding-left */
+    z-index: 10;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #C99E71;
+    text-decoration: none;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: color 0.3s ease;
+}
+.page-header__back-button-textual .material-icons-outlined {
+    font-size: 20px;
+}
+.page-header__back-button-textual:hover {
+    color: #FFFFFF;
 }
 
-/* Анимации */
+
+/* animations */
 @keyframes logo-glow-filter {
     0% { filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 12px rgba(255, 223, 186, 0.4)); }
     30% { filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 20px rgba(201, 158, 113, 0.3)); }
@@ -150,8 +173,12 @@ h2.section-title__h2 { /* Не используется */
     70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(201, 158, 113, 0); }
     100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(201, 158, 113, 0); }
 }
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 
-/* Стили шапки (остаются такими же, как на странице продуктов) */
+/* Header styles */
 #header-section { padding: 32px 0; background-color: #1C1814; position: relative; }
 .header { display: flex; justify-content: space-between; align-items: center; }
 .nav-main { flex-grow: 0.8; display: flex; justify-content: space-between; align-items: center; }
@@ -162,7 +189,7 @@ h2.section-title__h2 { /* Не используется */
 .header-action { display: flex; align-items: center; gap: 30px; margin-top: 8px; }
 .profile { position: relative; cursor: pointer; margin-left: 15px; display: flex; align-items: center; height: 42px; }
 .account { display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 50%; background-color: rgba(201, 158, 113, 0.1); transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); border: 2px solid transparent; overflow: hidden; position: relative; z-index: 2; }
-.account img.profile-avatar { width: 100%; height: 100%; object-fit: cover; transition: all 0.3s ease; border-radius: 50%; } /* Уточнил селектор и добавил border-radius */
+.account img.profile-avatar { width: 100%; height: 100%; object-fit: cover; transition: all 0.3s ease; border-radius: 50%; }
 .profile:hover .account { transform: scale(1.1); box-shadow: 0 0 0 3px rgba(201, 158, 113, 0.3); }
 .profile:hover .account img.profile-avatar { transform: scale(1.1); }
 .profile:focus-within .account { border-color: #C99E71; box-shadow: 0 0 0 3px rgba(201, 158, 113, 0.3); }
@@ -192,213 +219,43 @@ h2.section-title__h2 { /* Не используется */
 .admin { color: #9b59b6 !important; } .admin i { color: #9b59b6 !important; } .admin:hover { background: #f5eef8 !important; }
 .icon-user:before { content: "👤"; } .icon-orders:before { content: "📦"; } .icon-heart:before { content: "❤️"; } .icon-admin:before { content: "⚙️"; } .icon-logout:before { content: "🚪"; }
 
-/* Стили для поиска рецептов и кнопки "Мои рецепты" */
-.recipes-filter-bar {
-    display: flex;
-    gap: 15px;
-    align-items: center;
-    margin-bottom: 40px;
-}
-.recipes-search-container {
-    flex-grow: 1;
-    position: relative;
-}
-.recipes-filter-bar .search-input.main-search-input {
-    width: 100%;
-    padding: 10px 12px 10px 40px;
-    font: 500 15px 'Urbanist', Arial, Helvetica, sans-serif;
-    border: 1px solid #444;
-    border-radius: 6px;
-    background-color: #1C1814;
-    color: #FFFFFF;
-    outline: none;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    height: 42px;
-    opacity: 1;
-}
-.recipes-filter-bar .search-input.main-search-input:focus {
-    border-color: #C99E71;
-    box-shadow: 0 0 0 3px rgba(201, 158, 113, 0.2);
-}
-.recipes-filter-bar .search-icon {
-    position: absolute;
-    left: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 18px;
-    height: 18px;
-    opacity: 0.6;
-}
-.my-recipes-button-container {
-    flex-shrink: 0;
-}
-.btn-my-recipes {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 0 18px;
-    height: 42px;
-    font: 600 15px 'Urbanist', Arial, Helvetica, sans-serif;
-    color: #C99E71;
-    background-color: transparent;
-    border: 1px solid #C99E71;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, color 0.3s ease;
-    text-decoration: none;
-    white-space: nowrap;
-}
-.btn-my-recipes .material-icons-outlined {
-    font-size: 20px;
-}
-.btn-my-recipes:hover {
-    background-color: #C99E71;
-    color: #14110E;
-}
-.sr-only {
-    position: absolute; width: 10px; height: 1px; padding: 0; margin: -1px;
-    overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
-}
+/* Recipes Filter Bar styles */
+.recipes-filter-bar { display: flex; gap: 15px; align-items: center; margin-bottom: 40px; }
+.recipes-search-container { flex-grow: 1; position: relative; }
+.recipes-filter-bar .search-input.main-search-input { width: 100%; padding: 10px 12px 10px 40px; font: 500 15px 'Urbanist', Arial, Helvetica, sans-serif; border: 1px solid #444; border-radius: 6px; background-color: #1C1814; color: #FFFFFF; outline: none; transition: border-color 0.3s ease, box-shadow 0.3s ease; height: 42px; opacity: 1; }
+.recipes-filter-bar .search-input.main-search-input:focus { border-color: #C99E71; box-shadow: 0 0 0 3px rgba(201, 158, 113, 0.2); }
+.recipes-filter-bar .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; opacity: 0.6; }
+.my-recipes-button-container { flex-shrink: 0; }
+.btn-my-recipes { display: inline-flex; align-items: center; gap: 8px; padding: 0 18px; height: 42px; font: 600 15px 'Urbanist', Arial, Helvetica, sans-serif; color: #C99E71; background-color: transparent; border: 1px solid #C99E71; border-radius: 6px; cursor: pointer; transition: background-color 0.3s ease, color 0.3s ease; text-decoration: none; white-space: nowrap; }
+.btn-my-recipes .material-icons-outlined { font-size: 20px; }
+.btn-my-recipes:hover { background-color: #C99E71; color: #14110E; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 
+/* Recipe Card styles */
+ul.card-list { padding: 0; margin: 0 auto; list-style-type: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 35px; }
+ul.card-list li { display: block; margin: 0; text-align: left; border-radius: 8px; box-sizing: border-box; overflow: hidden; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); background-color: #1C1814; position: relative; transition: box-shadow 0.3s ease; }
+ul.card-list li:hover { box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35); }
+ul.card-list section { position: relative; overflow: hidden; height: 250px; border-radius: 8px 8px 0 0; }
+ul.card-list img.recipe-image { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s ease; }
+ul.card-list li:hover img.recipe-image { transform: scale(1.1); }
+ul.card-list .content { position: absolute; width: 100%; height: 100%; padding: 20px; top: 0; left: 0; text-align: left; color: #e0e0e0; background: linear-gradient(to top, rgba(20, 17, 14, 0.95) 60%, rgba(20, 17, 14, 0.6)); box-sizing: border-box; transform: translateY(100%); transition: transform .5s ease; display: flex; flex-direction: column; }
+ul.card-list li:hover .content { transform: translateY(0); }
+ul.card-list .content .recipe-content-title { font: 22px/28px 'Righteous', cursive; color: #C99E71; margin: 0 0 15px 0; padding-bottom: 10px; border-bottom: 1px solid #555; }
+ul.card-list .content .recipe-details { flex-grow: 1; overflow-y: auto; margin-bottom: 15px; scrollbar-width: thin; scrollbar-color: #555 #333; }
+ul.card-list .content .recipe-details::-webkit-scrollbar { width: 6px; }
+ul.card-list .content .recipe-details::-webkit-scrollbar-track { background: #333; border-radius: 3px; }
+ul.card-list .content .recipe-details::-webkit-scrollbar-thumb { background-color: #555; border-radius: 3px; }
+ul.card-list .content p { line-height: 1.6; font-size: 14px; padding: 0; margin: 0 0 1em 0; color: #ccc; }
+ul.card-list .content p strong { color: #aaa; font-weight: 600; display: inline-block; margin-bottom: 5px; }
+ul.card-list .content .save-recipe-btn { align-self: center; margin-top: auto; padding: 10px 20px; font-size: 14px; }
 
-/* Стили для карточек рецептов */
-ul.card-list {
-    padding: 0;
-    margin: 0 auto;
-    list-style-type: none;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 35px;
-}
-ul.card-list li {
-    display: block;
-    margin: 0;
-    text-align: left;
-    border-radius: 8px;
-    box-sizing: border-box;
-    overflow: hidden;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    background-color: #1C1814;
-    position: relative;
-    transition: box-shadow 0.3s ease;
-}
-ul.card-list li:hover {
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
-}
-/* ul.card-list article {} - не требует стилей */
-/* ul.card-list h1 {} - не используется в текущей разметке */
-ul.card-list section {
-    position: relative;
-    overflow: hidden;
-    height: 250px; /* Высота области с картинкой */
-    border-radius: 8px 8px 0 0; /* Скругление только верхних углов для картинки */
-}
-ul.card-list img.recipe-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    transition: transform .5s ease;
-    /* border-radius убран отсюда, т.к. есть у родителя section */
-}
-ul.card-list li:hover img.recipe-image {
-    transform: scale(1.1);
-}
-ul.card-list .content {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    padding: 20px;
-    top: 0;
-    left: 0;
-    text-align: left;
-    color: #e0e0e0;
-    background: linear-gradient(to top, rgba(20, 17, 14, 0.95) 60%, rgba(20, 17, 14, 0.6));
-    box-sizing: border-box;
-    transform: translateY(100%);
-    transition: transform .5s ease;
-    display: flex;
-    flex-direction: column;
-}
-ul.card-list li:hover .content {
-    transform: translateY(0);
-}
-ul.card-list .content .recipe-content-title {
-    font: 22px/28px 'Righteous', cursive;
-    color: #C99E71;
-    margin: 0 0 15px 0;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #555;
-}
-ul.card-list .content .recipe-details {
-    flex-grow: 1;
-    overflow-y: auto;
-    margin-bottom: 15px;
-    scrollbar-width: thin;
-    scrollbar-color: #555 #333;
-}
-ul.card-list .content .recipe-details::-webkit-scrollbar {
-    width: 6px;
-}
-ul.card-list .content .recipe-details::-webkit-scrollbar-track {
-    background: #333;
-    border-radius: 3px;
-}
-ul.card-list .content .recipe-details::-webkit-scrollbar-thumb {
-    background-color: #555;
-    border-radius: 3px;
-}
-ul.card-list .content p {
-    line-height: 1.6;
-    font-size: 14px;
-    padding: 0;
-    margin: 0 0 1em 0;
-    color: #ccc;
-}
-ul.card-list .content p strong {
-    color: #aaa;
-    font-weight: 600;
-    display: inline-block;
-    margin-bottom: 5px;
-}
-ul.card-list .content .save-recipe-btn { /* Кнопка "Сохранить" */
-    align-self: center;
-    margin-top: auto; /* Прижимает кнопку к низу .content */
-    padding: 10px 20px;
-    font-size: 14px;
-}
+.delete-recipe-form { position: absolute; top: 10px; right: 10px; z-index: 5; line-height: 0; }
+.delete-recipe-btn { background-color: rgba(255, 77, 77, 0.7); color: #fff; padding: 0; width: 28px; height: 28px; border-radius: 50%; font-size: 16px; line-height: 28px; text-align: center; box-shadow: none; border: none; transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease; cursor: pointer; }
+.delete-recipe-btn:hover { background-color: #e60000; transform: scale(1.15) rotate(90deg); box-shadow: 0 2px 5px rgba(0,0,0,0.4); }
 
-/* Кнопка удаления (если будет использоваться на других страницах) */
-.delete-recipe-form {
-    position: absolute; top: 10px; right: 10px; z-index: 5; line-height: 0;
-}
-.delete-recipe-btn {
-    background-color: rgba(255, 77, 77, 0.7); color: #fff; padding: 0;
-    width: 28px; height: 28px; border-radius: 50%; font-size: 16px;
-    line-height: 28px; text-align: center; box-shadow: none; border: none;
-    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease; cursor: pointer;
-}
-.delete-recipe-btn:hover {
-    background-color: #e60000; transform: scale(1.15) rotate(90deg); box-shadow: 0 2px 5px rgba(0,0,0,0.4);
-}
-.back-button-container { /* Не используется на этой странице */
-    text-align: center; margin-top: 40px; margin-bottom: 20px;
-}
+.no-recipes-item, .no-recipes-message, .no-recipes-message-js { grid-column: 1 / -1; text-align: center; color: #888; font-size: 18px; padding: 60px 20px; }
 
-/* Сообщение об отсутствии рецептов */
-.no-recipes-item, /* Если будет одиночный элемент для сообщения */
-.no-recipes-message,
-.no-recipes-message-js { /* Для JS-сообщения */
-    grid-column: 1 / -1; /* Растянуть на все колонки грида */
-    text-align: center;
-    color: #888;
-    font-size: 18px;
-    padding: 60px 20px;
-    /* Убрал лишние стили, которые были специфичны для .no-recipes-item */
-}
-
-
-/* Стили футера (остаются такими же, как на странице продуктов) */
+/* Footer styles */
 .footer { display: flex; flex-wrap: wrap; align-items: center; row-gap: 20px; padding-top: 70px; padding-bottom: 30px; }
 .footer__img { margin-right: 36px; flex-shrink: 0; width: 72px; height: 60px; }
 .footer__list { display: flex; flex-wrap: wrap; justify-content: center; gap: 30px 40px; font-size: 18px; flex-grow: 1; text-align: center; }
@@ -407,7 +264,7 @@ ul.card-list .content .save-recipe-btn { /* Кнопка "Сохранить" */
 .footer-copyright__text { color: #FFFFFF; opacity: 0.7; font-size: 14px; }
 
 
-/* Адаптивность */
+/* Media Queries */
 @media (max-width: 992px) {
     .nav-main__list { gap: 40px; }
 }
@@ -417,44 +274,192 @@ ul.card-list .content .save-recipe-btn { /* Кнопка "Сохранить" */
     .header__logo { position: static; transform: none; margin-bottom: 15px; }
     .nav-main { flex-direction: column; gap: 15px; }
     .nav-main__list { gap: 20px; justify-content: center; }
-    .section-subtitle { font-size: 28px; }
-
-    .recipes-filter-bar {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-    }
-    .recipes-search-container,
-    .my-recipes-button-container {
-        width: 100%;
-    }
-    .btn-my-recipes {
-        width: 100%;
-        justify-content: center;
-    }
-
+    .section-subtitle { font-size: 28px; padding-top: 50px;} /* Adjust subtitle size */
+    .page-header__back-button-textual { left: 30px; top: 50px;} /* Adjust back button positioning */
+    .recipes-filter-bar { flex-direction: column; align-items: stretch; gap: 10px; }
+    .recipes-search-container, .my-recipes-button-container { width: 100%; }
+    .btn-my-recipes { width: 100%; justify-content: center; }
     ul.card-list { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
     ul.card-list section { height: 220px; }
     ul.card-list .content { padding: 15px; }
     ul.card-list .content .recipe-content-title { font-size: 20px; }
     ul.card-list .content p { font-size: 13px; }
     ul.card-list .content .save-recipe-btn { padding: 8px 15px; font-size: 13px; }
-
     .footer { flex-direction: column; text-align: center; }
     .footer__img { margin-right: 0; margin-bottom: 20px; }
 }
-
 @media (max-width: 480px) {
     .container { padding: 0 15px; }
+    h2.section-title__h2 { font-size: 20px; }
+    .section-subtitle { font-size: 24px; padding-top: 40px;} /* Adjust subtitle size */
+    .page-header__back-button-textual { left: 15px; top: 40px;} /* Adjust back button positioning */
     .nav-main__list { flex-direction: column; gap: 15px; }
-    .section-subtitle { font-size: 24px; }
-    .recipes-filter-bar { margin-bottom: 30px; } /* Уменьшил отступ */
+    .recipes-filter-bar { margin-bottom: 30px; }
     ul.card-list { grid-template-columns: 1fr; gap: 20px; }
     ul.card-list section { height: 200px; }
 }
 
-/* Toastr styles - можно вынести в отдельный файл или оставить здесь, если используются только на этой странице */
+/* Toastr styles */
 .toast-success { background-color: #51a351 !important; }
 .toast-error { background-color: #bd362f !important; }
 .toast-info { background-color: #2f96b4 !important; }
 .toast-warning { background-color: #f89406 !important; }
+
+/* --- СТИЛИ ДЛЯ ДЕТАЛЬНОЙ СТРАНИЦЫ НОВОСТЕЙ --- */
+
+/* Заголовок с кнопкой назад для страницы новостей */
+.news-detail-header-block {
+    padding-top: 50px;
+    margin-bottom: 30px;
+    position: relative;
+    min-height: 40px;
+}
+.news-detail-header-block > .container { /* Внутренний контейнер для позиционирования кнопки */
+    position: relative;
+    min-height: 40px; /* Та же высота, что и у родителя */
+}
+/* Кнопка "назад" для новостей, использует общий класс, но специфично позиционируется */
+.news-detail-header-block .page-header__back-button-textual {
+    position: absolute;
+    left: 75px; /* Отступ контейнера */
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+}
+
+/* Обертка заголовка новости для центрирования с линиями */
+.news-detail__title-centered-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    padding: 0 15px;
+    box-sizing: border-box;
+}
+.news-detail__title-centered-wrapper::before,
+.news-detail__title-centered-wrapper::after {
+    content: '';
+    height: 1px;
+    background-color: #383838;
+    flex-grow: 1;
+    max-width: 20%; /* Ограничиваем линии */
+}
+.news-detail__title-centered-wrapper::before { margin-right: 20px; }
+.news-detail__title-centered-wrapper::after { margin-left: 20px; }
+
+.news-detail__main-title-centered { /* Стиль заголовка новости */
+    font-family: 'Urbanist', Arial, Helvetica, sans-serif;
+    font-size: 32px;
+    line-height: 1.4;
+    font-weight: 600;
+    color: #FFFFFF;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-shrink: 0;
+    padding: 0 5px;
+}
+
+/* Адаптация заголовка новостей */
+@media (max-width: 768px) {
+    .news-detail-header-block .page-header__back-button-textual { left: 30px; }
+    .news-detail__title-centered-wrapper::before,
+    .news-detail__title-centered-wrapper::after { margin-right: 10px; margin-left: 10px; }
+    .news-detail__main-title-centered { font-size: 28px; }
+}
+@media (max-width: 480px) {
+     .news-detail-header-block .page-header__back-button-textual { left: 15px; }
+    .news-detail__main-title-centered { font-size: 24px; }
+    .news-detail__title-centered-wrapper { padding: 0 5px; }
+}
+
+/* Сама карточка новости */
+.news-card_detail {
+    position: relative;
+    background: #1C1814;
+    border-radius: 12px;
+    padding: 40px;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto 50px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    border: 1px solid #333;
+    animation: fadeIn 0.6s ease-out;
+}
+.news-image {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 0 auto 30px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+.news-date {
+    display: block;
+    font-size: 14px;
+    color: #aaa;
+    text-align: center;
+    margin-bottom: 30px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.news-content {
+    font-size: 17px;
+    line-height: 1.8;
+    color: #E0E0E0;
+    margin-bottom: 40px;
+}
+.news-content p { margin-bottom: 1.5em; }
+.news-content h2, .news-content h3 { color: #C99E71; margin-top: 1.5em; margin-bottom: 0.8em; font-family: 'Righteous', cursive; font-weight: 600; line-height: 1.3; }
+.news-content h2 { font-size: 1.8em; } .news-content h3 { font-size: 1.5em; }
+.news-content blockquote { margin: 20px 0; padding: 15px 20px 15px 45px; background-color: #221E1A; border-left: 5px solid #C99E71; position: relative; font-style: italic; color: #E0E0E0; border-radius: 0 6px 6px 0; }
+.news-content blockquote::before { content: '\f10d'; font-family: 'Font Awesome 6 Free'; font-weight: 900; position: absolute; left: 15px; top: 10px; font-size: 24px; color: #C99E71; opacity: 0.7; }
+.news-content ul, .news-content ol { margin-left: 20px; margin-bottom: 1.5em; list-style-type: disc; }
+.news-content ul li, .news-content ol li { list-style-type: inherit; margin-bottom: 0.5em; color: #E0E0E0; }
+.news-content ul li::marker { color: #C99E71; } .news-content ol li::marker { color: #C99E71; }
+
+/* Слайдер, видео, кнопки поделиться, навигация, комментарии для новостей */
+.swiper-slide img { display: block; width: 100%; height: auto; max-height: 500px; object-fit: cover; }
+.swiper-button-next, .swiper-button-prev { color: #C99E71 !important; }
+.swiper-pagination-bullet-active { background-color: #C99E71 !important; }
+.video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; background: #000; margin: 30px auto; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+.video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+.share-buttons { margin-top: 30px; margin-bottom: 40px; text-align: center; }
+.share-buttons p { font-size: 16px; color: #C99E71; margin-bottom: 15px; font-weight: 600; }
+.share-button { display: inline-flex; align-items: center; justify-content: center; width: 45px; height: 45px; margin: 0 8px; border-radius: 50%; color: #FFFFFF; font-size: 20px; text-decoration: none; transition: transform 0.2s ease, background-color 0.2s ease; border: 1px solid #444; cursor: pointer; }
+.share-button:hover { transform: scale(1.1); }
+.share-button.vk { background-color: #4a76a8; border-color: #4a76a8;} .share-button.vk:hover { background-color: #5283bb; }
+.share-button.telegram { background-color: #0088cc; border-color: #0088cc;} .share-button.telegram:hover { background-color: #0099e6; }
+.share-button.whatsapp { background-color: #25D366; border-color: #25D366;} .share-button.whatsapp:hover { background-color: #1ebe57; }
+.share-button.copy-link { background-color: #555; border-color: #555;} .share-button.copy-link:hover { background-color: #666; }
+.navigation-buttons { display: flex; justify-content: space-between; align-items: center; margin-top: 40px; gap: 20px; flex-wrap: wrap; }
+.navigation-buttons > .btn-primary, .navigation-buttons > .disabled-nav-button { flex-grow: 0; min-width: 180px; }
+.navigation-buttons .btn-primary { padding: 12px 25px; font-size: 16px; }
+.navigation-buttons .btn-primary .material-icons-outlined { font-size: 20px; vertical-align: middle; line-height: 1; }
+.navigation-buttons .btn-primary.disabled-nav-button { background-color: #7d6a56; color: #3b3128; cursor: not-allowed; opacity: 0.6; }
+.navigation-buttons .btn-primary.disabled-nav-button:hover { background-color: #7d6a56; transform: none; }
+#comments-section { margin-top: 50px; padding-top: 30px; border-top: 1px solid #333; }
+.comments-title { font-size: 24px; color: #C99E71; margin-bottom: 25px; font-family: 'Righteous', cursive; text-align: center; }
+.comment-form { margin-bottom: 40px; text-align: center;}
+.comment-form textarea { width: 100%; min-height: 120px; padding: 15px; border: 1px solid #333; border-radius: 6px; background-color: #1C1814; color: #FFFFFF; font-size: 16px; resize: vertical; margin-bottom: 15px; }
+.comment-form textarea:focus { border-color: #C99E71; outline: none; }
+.comment-form .form-group { margin-bottom: 15px; text-align: left; }
+.comment-form label { display: block; margin-bottom: 8px; color: #aaa; font-size: 14px; }
+.comment-form input[type="text"] { margin-bottom: 0; }
+.comment-form .btn-primary { display: inline-block; margin-top: 15px; float: none; }
+.comment-error { color: #e74c3c; font-size: 14px; margin-bottom: 15px; text-align:left; }
+.comment-list { list-style: none; padding: 0; }
+.comment-item { background-color: #221E1A; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #3a3531; display: flex; gap: 15px; text-align: left;}
+.comment-avatar { width: 50px; height: 50px; border-radius: 50%; overflow: hidden; flex-shrink: 0; }
+.comment-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.comment-content { flex-grow: 1; }
+.comment-author { font-weight: 600; color: #C99E71; margin-bottom: 5px; font-size: 17px; }
+.comment-date { font-size: 13px; color: #888; margin-bottom: 10px; }
+.comment-text { font-size: 16px; line-height: 1.7; color: #E0E0E0; word-wrap: break-word; }
+.no-comments { text-align: center; color: #aaa; padding: 20px; font-style: italic; }

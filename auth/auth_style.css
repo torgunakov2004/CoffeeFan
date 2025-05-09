@@ -1,0 +1,162 @@
+@import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700&family=Righteous&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #14110E; /* Фон как на основном сайте */
+    color: #FFFFFF;
+    font-family: 'Urbanist', Arial, Helvetica, sans-serif; /* Шрифт как на основном сайте */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px; /* Отступы для маленьких экранов */
+}
+
+.auth-container {
+    background-color: #1C1814; /* Фон контейнера, как шапка сайта */
+    padding: 35px 45px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    width: 100%;
+    max-width: 420px; /* Ограничиваем максимальную ширину формы */
+    text-align: center; /* Для логотипа/заголовка */
+}
+
+.auth-logo {
+    width: 70px; /* Размер лого */
+    height: auto;
+    margin-bottom: 25px;
+    filter: drop-shadow(0 0 8px rgba(201, 158, 113, 0.3)); /* Легкое свечение */
+}
+
+.auth-title {
+    font-family: 'Righteous', cursive; /* Декоративный шрифт для заголовка */
+    font-size: 28px;
+    color: #C99E71; /* Акцентный цвет */
+    margin-bottom: 30px;
+}
+
+.auth-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px; /* Расстояние между элементами формы */
+    text-align: left; /* Выравнивание label и input */
+}
+
+.auth-container label {
+    font-size: 14px;
+    color: #ccc; /* Светло-серый для label */
+    margin-bottom: -10px; /* Чтобы label был ближе к input */
+    font-weight: 500;
+}
+
+.auth-container input[type="text"],
+.auth-container input[type="email"],
+.auth-container input[type="password"] {
+    background-color: #14110E; /* Темный фон для инпутов */
+    border: 1px solid #444; /* Рамка для инпутов */
+    border-radius: 6px;
+    padding: 12px 15px;
+    color: #FFFFFF;
+    font-size: 16px;
+    font-family: 'Urbanist', sans-serif;
+    width: 100%;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.auth-container input[type="text"]:focus,
+.auth-container input[type="email"]:focus,
+.auth-container input[type="password"]:focus {
+    border-color: #C99E71; /* Акцентная рамка при фокусе */
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(201, 158, 113, 0.25); /* Тень при фокусе */
+}
+
+.auth-container button[type="submit"] {
+    background-color: #C99E71; /* Акцентный цвет для кнопки */
+    color: #14110E; /* Темный текст на кнопке */
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif; /* Шрифт как у .btn-primary */
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-top: 10px; /* Отступ над кнопкой */
+}
+
+.auth-container button[type="submit"]:hover {
+    background-color: #bd864b; /* Темнее акцент при наведении */
+    transform: translateY(-2px);
+}
+
+.auth-container p {
+    font-size: 14px;
+    color: #bbb;
+    margin-top: 20px; /* Отступ для текста "У вас нет аккаунта?" */
+    text-align: center;
+}
+
+.auth-container p a {
+    color: #C99E71; /* Акцентный цвет для ссылок */
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.auth-container p a:hover {
+    text-decoration: underline;
+    color: #dfb48a; /* Светлее акцент при наведении */
+}
+
+.auth-container .msg { /* Для сообщений об ошибках/успехе */
+    padding: 12px 15px;
+    margin-top: 15px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+    border-width: 1px;
+    border-style: solid;
+}
+/* Если у вас будут разные типы сообщений, можно добавить классы .error .success */
+.auth-container .msg.error, /* Используем этот класс, если $_SESSION['message'] всегда ошибка */
+.auth-container .msg { /* Если нет .error, применяем как стиль ошибки по умолчанию */
+    background-color: rgba(217, 83, 79, 0.1); /* Полупрозрачный красный фон */
+    color: #d9534f; /* Красный текст */
+    border-color: #d9534f; /* Красная рамка */
+}
+
+.auth-container .msg.success {
+    background-color: rgba(92, 184, 92, 0.1); /* Полупрозрачный зеленый фон */
+    color: #5cb85c; /* Зеленый текст */
+    border-color: #5cb85c; /* Зеленая рамка */
+}
+
+
+/* Адаптивность */
+@media (max-width: 480px) {
+    .auth-container {
+        padding: 25px 30px;
+    }
+    .auth-title {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    .auth-container input[type="text"],
+    .auth-container input[type="email"],
+    .auth-container input[type="password"],
+    .auth-container button[type="submit"] {
+        font-size: 15px;
+        padding: 10px 12px;
+    }
+    .auth-container p {
+        font-size: 13px;
+    }
+}

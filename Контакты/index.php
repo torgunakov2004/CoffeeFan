@@ -27,6 +27,7 @@ $has_items_in_cart = !empty($cart_quantities);
     <title>CoffeeeFan - Контакты</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Icons+Outlined">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <link rel="stylesheet" href="/menu_style.css">
@@ -78,10 +79,10 @@ $has_items_in_cart = !empty($cart_quantities);
                         <button class="header-action__cart-1 material-icons-outlined <?php echo $has_items_in_cart ? 'active' : ''; ?>" title="Корзина">shopping_cart</button>
                     </a>
                     <nav class="profile">
-                    <nav class="account">
-                        <img src="<?php echo $_SESSION['user']['avatar'] ?? '../img/icons8.png'; ?>" class="profile-avatar" alt="Аватар профиля">
-                    </nav>
-                        <?php if (!$_SESSION): ?>
+                        <nav class="account">
+                             <img src="<?php echo isset($_SESSION['user']['avatar']) && file_exists('..'.ltrim($_SESSION['user']['avatar'], '.')) ? htmlspecialchars($_SESSION['user']['avatar']) : '../img/icons8.png'; ?>" class="profile-avatar" alt="Профиль">
+                        </nav>
+                         <?php if (!isset($_SESSION['user'])): ?>
                             <ul class="submenu">
                                 <li><a class="log" href="../auth/authorization.php">Вход</a></li>
                                 <li><a class="log" href="../auth/register.php">Регистрация</a></li>
@@ -89,12 +90,12 @@ $has_items_in_cart = !empty($cart_quantities);
                         <?php else: ?>
                             <ul class="submenu">
                                 <li class="user-info">
-                                <div class="user-avatar">
-                                    <img src="<?php echo $_SESSION['user']['avatar'] ?? '../img/default-avatar.jpg'; ?>" alt="Аватар">
-                                </div>
+                                    <div class="user-avatar">
+                                        <img src="<?php echo isset($_SESSION['user']['avatar']) && file_exists('..'.ltrim($_SESSION['user']['avatar'], '.')) ? htmlspecialchars($_SESSION['user']['avatar']) : '../img/default-avatar.jpg'; ?>" alt="Аватар">
+                                    </div>
                                     <div class="user-details">
-                                    <span class="user-name"><?= htmlspecialchars($_SESSION["user"]['first_name'] ?? ($_SESSION["user"]['name'] ?? 'Пользователь')) ?></span>
-                                        <span class="user-email"><?= htmlspecialchars($_SESSION["user"]['email']) ?></span>
+                                        <span class="user-name"><?= htmlspecialchars($_SESSION["user"]['first_name'] ?? '') ?></span>
+                                        <span class="user-email"><?= htmlspecialchars($_SESSION["user"]['email'] ?? '') ?></span>
                                     </div>
                                 </li>
                                 <li class="menu-divider"></li>
@@ -180,19 +181,7 @@ $has_items_in_cart = !empty($cart_quantities);
             </section>
         </div>
     </main>
-
-     <footer id="footer-section">
-         <div class="container">
-             <div class="footer">
-             </div>
-         </div>
-         <div class="footer-copyright">
-             <div class="container">
-                 <p class="footer-copyright__text">CoffeeeFan © 2024. Все права защищены</p>
-             </div>
-         </div>
-     </footer>
-
+    <?php include_once '../footer.php'; ?>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>

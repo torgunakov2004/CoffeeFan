@@ -35,9 +35,8 @@ $has_items_in_cart = !empty($cart_quantities);
     <title>Coffeee shop</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Icons+Outlined">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="style.css">
-    <script src="JS.js"></script>
-    <link rel="stylesheet" href="/menu_style.css">
 </head>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
@@ -78,9 +77,9 @@ $has_items_in_cart = !empty($cart_quantities);
                     <button class="header-action__cart-1 material-icons-outlined <?php echo $has_items_in_cart ? 'active' : ''; ?>">shopping_cart</button>
                 </a>
                 <nav class="profile">
-                    <nav class="account">
-                        <img src="<?php echo $_SESSION['user']['avatar'] ?? '../img/icons8.png'; ?>" class="profile-avatar" alt="Аватар профиля">
-                    </nav>
+                        <nav class="account">
+                            <img src="../img/icons8.png" class="profile-avatar">
+                        </nav>
                         <?php if (!$_SESSION): ?>
                             <ul class="submenu">
                                 <li><a class="log" href="../auth/authorization.php">Вход</a></li>
@@ -89,11 +88,11 @@ $has_items_in_cart = !empty($cart_quantities);
                         <?php else: ?>
                             <ul class="submenu">
                                 <li class="user-info">
-                                <div class="user-avatar">
-                                    <img src="<?php echo $_SESSION['user']['avatar'] ?? '../img/default-avatar.jpg'; ?>" alt="Аватар">
-                                </div>
+                                    <div class="user-avatar">
+                                        <img src="<?php echo $_SESSION['user']['avatar'] ?? 'img/default-avatar.jpg'; ?>" alt="Аватар">
+                                    </div>
                                     <div class="user-details">
-                                    <span class="user-name"><?= htmlspecialchars($_SESSION["user"]['first_name'] ?? ($_SESSION["user"]['name'] ?? 'Пользователь')) ?></span>
+                                        <span class="user-name"><?= htmlspecialchars($_SESSION["user"]['name']) ?></span>
                                         <span class="user-email"><?= htmlspecialchars($_SESSION["user"]['email']) ?></span>
                                     </div>
                                 </li>
@@ -101,7 +100,7 @@ $has_items_in_cart = !empty($cart_quantities);
                                 <li><a class="menu-item" href="profile.php"><i class="icon-user"></i>Мой профиль</a></li>
                                 <li><a class="menu-item" href="orders.php"><i class="icon-orders"></i>Мои заказы</a></li>
                                 <li><a class="menu-item" href="favorites.php"><i class="icon-heart"></i>Избранное</a></li>
-                                <?php if (isset($_SESSION['user']['is_admin']) && $_SESSION['user']['is_admin']): ?>
+                                <?php if ($_SESSION['admin']): ?>
                                     <li class="menu-divider"></li>
                                     <li><a class="menu-item admin" href="../admin/admin_dashboard.php"><i class="icon-admin"></i>Админ-панель</a></li>
                                 <?php endif; ?>
@@ -114,7 +113,6 @@ $has_items_in_cart = !empty($cart_quantities);
             </div>
         </div>
     </header>
-
     <section id="section-news" class="section-main">
         <div class="container">
             <h3 class="section-subtitle">Наши актуальные новости</h3>
@@ -133,18 +131,6 @@ $has_items_in_cart = !empty($cart_quantities);
             </div>
         </div>
     </section>
-
-    <footer id="footer-section">
-        <div class="container">
-            <div class="footer">
-            
-            </div>
-        </div>
-        <div class="footer-copyright">
-            <div class="container">
-                <p class="footer-copyright__text">e-Wiwonti © 2025. Все права защищены</p>
-            </div>
-        </div>
-    </footer>
+    <?php include_once '../footer.php'; ?>
 </body>
 </html>

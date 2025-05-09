@@ -14,9 +14,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_recipe'])) {
     $delete_stmt = $connect->prepare("DELETE FROM `saved_recipes` WHERE `user_id` = ? AND `recipe_id` = ?");
     $delete_stmt->bind_param("ii", $user_id, $recipe_id_to_delete);
     if ($delete_stmt->execute()) {
-         $_SESSION['message'] = 'Рецепт успешно удален.'; // Сообщение для Toastr
+         $_SESSION['message'] = 'Рецепт успешно удален.';
      } else {
-         $_SESSION['error'] = 'Ошибка удаления рецепта.'; // Сообщение для Toastr
+         $_SESSION['error'] = 'Ошибка удаления рецепта.';
      }
     $delete_stmt->close();
     header('Location: my_recipes.php');
@@ -50,8 +50,8 @@ $has_items_in_cart = !empty($cart_quantities);
     <title>CoffeeeFan - Мои рецепты</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Icons+Outlined">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="/menu_style.css"> <?php /* Ensure this path is correct */ ?>
 </head>
 <body>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -69,7 +69,7 @@ $has_items_in_cart = !empty($cart_quantities);
                             <a class="nav-main__link" href="../Продукты/index.php">Продукты</a>
                         </li>
                         <li class="nav-main__item">
-                            <a class="nav-main__link" href="../Рецепты/index.php">Рецепты</a> <?php /* Ссылка на основной раздел */ ?>
+                            <a class="nav-main__link nav-main__link_selected" href="index.php">Рецепты</a>
                         </li>
                         <li class="nav-main__item">
                             <a class="nav-main__link" href="../Акции/index.php">Акции</a>
@@ -93,10 +93,10 @@ $has_items_in_cart = !empty($cart_quantities);
                         <button class="header-action__cart-1 material-icons-outlined <?php echo $has_items_in_cart ? 'active' : ''; ?>" title="Корзина">shopping_cart</button>
                     </a>
                     <nav class="profile">
-                    <nav class="account">
-                        <img src="<?php echo $_SESSION['user']['avatar'] ?? '../img/icons8.png'; ?>" class="profile-avatar" alt="Аватар профиля">
-                    </nav>
-                        <?php if (!$_SESSION): ?>
+                        <nav class="account">
+                             <img src="<?php echo $_SESSION['user']['avatar'] ?? '../img/icons8.png'; ?>" class="profile-avatar" alt="Аватар профиля">
+                        </nav>
+                        <?php if (!isset($_SESSION['user'])): ?>
                             <ul class="submenu">
                                 <li><a class="log" href="../auth/authorization.php">Вход</a></li>
                                 <li><a class="log" href="../auth/register.php">Регистрация</a></li>
@@ -104,18 +104,18 @@ $has_items_in_cart = !empty($cart_quantities);
                         <?php else: ?>
                             <ul class="submenu">
                                 <li class="user-info">
-                                <div class="user-avatar">
-                                    <img src="<?php echo $_SESSION['user']['avatar'] ?? '../img/default-avatar.jpg'; ?>" alt="Аватар">
-                                </div>
+                                    <div class="user-avatar">
+                                        <img src="<?php echo $_SESSION['user']['avatar'] ?? '../img/default-avatar.jpg'; ?>" alt="Аватар">
+                                    </div>
                                     <div class="user-details">
-                                    <span class="user-name"><?= htmlspecialchars($_SESSION["user"]['first_name'] ?? ($_SESSION["user"]['name'] ?? 'Пользователь')) ?></span>
+                                        <span class="user-name"><?= htmlspecialchars($_SESSION["user"]['first_name'] ?? ($_SESSION["user"]['name'] ?? 'Пользователь')) ?></span>
                                         <span class="user-email"><?= htmlspecialchars($_SESSION["user"]['email']) ?></span>
                                     </div>
                                 </li>
                                 <li class="menu-divider"></li>
-                                <li><a class="menu-item" href="profile.php"><i class="icon-user"></i>Мой профиль</a></li>
-                                <li><a class="menu-item" href="orders.php"><i class="icon-orders"></i>Мои заказы</a></li>
-                                <li><a class="menu-item" href="favorites.php"><i class="icon-heart"></i>Избранное</a></li>
+                                <li><a class="menu-item" href="../profile.php"><i class="icon-user"></i>Мой профиль</a></li>
+                                <li><a class="menu-item" href="../orders.php"><i class="icon-orders"></i>Мои заказы</a></li>
+                                <li><a class="menu-item" href="../favorites.php"><i class="icon-heart"></i>Избранное</a></li>
                                 <?php if (isset($_SESSION['user']['is_admin']) && $_SESSION['user']['is_admin']): ?>
                                     <li class="menu-divider"></li>
                                     <li><a class="menu-item admin" href="../admin/admin_dashboard.php"><i class="icon-admin"></i>Админ-панель</a></li>
@@ -132,7 +132,14 @@ $has_items_in_cart = !empty($cart_quantities);
 
     <main>
         <div class="container">
-            <h3 class="section-subtitle">Ваши сохраненные рецепты!</h3>
+            <div class="page-standalone-back-button-wrapper">
+                <a href="index.php" class="page-header__back-button-textual" title="Вернуться назад">
+                    <span class="material-icons-outlined">arrow_back_ios_new</span> Вернуться назад
+                </a>
+            </div>
+
+            <h3 class="section-subtitle">Ваши сохраненные рецепты</h3>
+
             <section>
                 <ul class="card-list">
                     <?php if ($recipes_result->num_rows > 0): ?>
@@ -141,7 +148,8 @@ $has_items_in_cart = !empty($cart_quantities);
                                  <article>
                                      <section>
                                          <img src="<?php echo htmlspecialchars($recipe['image']); ?>" alt="<?php echo htmlspecialchars($recipe['title']); ?>" class="recipe-image">
-                                         <form method="post" class="delete-recipe-form" onsubmit="return confirm('Вы уверены, что хотите удалить этот рецепт?');">
+                                         <!-- УДАЛЕН onsubmit ИЗ ФОРМЫ -->
+                                         <form method="post" class="delete-recipe-form">
                                              <input type="hidden" name="recipe_id" value="<?php echo $recipe['id']; ?>">
                                              <button type="submit" name="delete_recipe" class="delete-recipe-btn" title="Удалить рецепт">✖</button>
                                          </form>
@@ -164,33 +172,9 @@ $has_items_in_cart = !empty($cart_quantities);
                     <?php $recipes_stmt->close(); ?>
                 </ul>
             </section>
-            <div class="back-button-container">
-                <a href="index.php" class="back-button btn-primary">Назад к рецептам</a>
-            </div>
         </div>
     </main>
-
-     <footer id="footer-section">
-         <div class="container">
-             <div class="footer">
-                  <img class="footer__img" src="../img/logo.svg" alt="CoffeeeFan Logo">
-                  <ul class="footer__list">
-                      <li class="footer__item"><a class="footer__link" href="../index.php">Главная</a></li>
-                      <li class="footer__item"><a class="footer__link" href="../Рецепты/index.php">Рецепты</a></li>
-                      <li class="footer__item"><a class="footer__link" href="../Продукты/index.php">Продукты</a></li>
-                      <li class="footer__item"><a class="footer__link" href="../Меню/index.php">Меню</a></li>
-                      <li class="footer__item"><a class="footer__link" href="../О кофе/index.php">О кофе</a></li>
-                      <li class="footer__item"><a class="footer__link" href="../Новости/index.php">Новости</a></li>
-                      <li class="footer__item"><a class="footer__link" href="../Контакты/index.php">Контакты</a></li>
-                  </ul>
-             </div>
-         </div>
-         <div class="footer-copyright">
-             <div class="container">
-                 <p class="footer-copyright__text">CoffeeeFan © 2024. Все права защищены</p>
-             </div>
-         </div>
-     </footer>
+    <?php include_once '../footer.php'; ?>
      <script>
         $(document).ready(function() {
             <?php

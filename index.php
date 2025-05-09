@@ -69,6 +69,7 @@ $has_items_in_cart = !empty($cart_quantities);
     <title>CoffeeeFan</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Icons+Outlined">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="menu_style.css">
     <script src="JS.js"></script>
@@ -112,9 +113,9 @@ $has_items_in_cart = !empty($cart_quantities);
                     <button class="header-action__cart-1 material-icons-outlined <?php echo $has_items_in_cart ? 'active' : ''; ?>">shopping_cart</button>
                 </a>
                 <nav class="profile">
-                <nav class="account">
-                    <img src="<?php echo $_SESSION['user']['avatar'] ?? '../img/icons8.png'; ?>" class="profile-avatar" alt="Аватар профиля">
-                </nav>
+                    <nav class="account">
+                        <img src="img/icons8.png" class="profile-avatar">
+                    </nav>
                     <?php if (!$_SESSION): ?>
                         <ul class="submenu">
                             <li><a class="log" href="auth/authorization.php">Вход</a></li>
@@ -123,11 +124,11 @@ $has_items_in_cart = !empty($cart_quantities);
                     <?php else: ?>
                         <ul class="submenu">
                             <li class="user-info">
-                            <div class="user-avatar">
-                                <img src="<?php echo $_SESSION['user']['avatar'] ?? '../img/default-avatar.jpg'; ?>" alt="Аватар">
-                            </div>
+                                <div class="user-avatar">
+                                    <img src="<?php echo $_SESSION['user']['avatar'] ?? ''; ?>" alt="Аватар">
+                                </div>
                                 <div class="user-details">
-                                <span class="user-name"><?= htmlspecialchars($_SESSION["user"]['first_name'] ?? ($_SESSION["user"]['name'] ?? 'Пользователь')) ?></span>
+                                    <span class="user-name"><?= htmlspecialchars($_SESSION["user"]['name']) ?></span>
                                     <span class="user-email"><?= htmlspecialchars($_SESSION["user"]['email']) ?></span>
                                 </div>
                             </li>
@@ -135,7 +136,7 @@ $has_items_in_cart = !empty($cart_quantities);
                             <li><a class="menu-item" href="profile.php"><i class="icon-user"></i>Мой профиль</a></li>
                             <li><a class="menu-item" href="orders.php"><i class="icon-orders"></i>Мои заказы</a></li>
                             <li><a class="menu-item" href="favorites.php"><i class="icon-heart"></i>Избранное</a></li>
-                            <?php if (isset($_SESSION['user']['is_admin']) && $_SESSION['user']['is_admin']): ?>
+                            <?php if ($_SESSION['admin']): ?>
                                 <li class="menu-divider"></li>
                                 <li><a class="menu-item admin" href="admin/admin_dashboard.php"><i class="icon-admin"></i>Админ-панель</a></li>
                             <?php endif; ?>
@@ -159,7 +160,7 @@ $has_items_in_cart = !empty($cart_quantities);
                         <h2 class="banner__header">Наслаждайтесь утренним кофе</h2>
                         <p class="banner__text">Кофе варится путем кулачной обжарки зеленых кофейных зерен над горячими углями в мангале. 
                             Не упустите возможность испробовать</p>
-                        <a href="Тесты/index.php" class="banner__btn btn-primary">ТЕСТ КОФЕ</a>
+                        <a href="О кофе/index.php" class="banner__btn btn-primary">ТЕСТ КОФЕ</a>
                     </div>
                     <button class="banner-video__btn" onclick="toggleVideo()">
                         <span class="banner-video__btn-text">Pause video</span>
@@ -181,7 +182,7 @@ $has_items_in_cart = !empty($cart_quantities);
             }
         </script>
         <div class="container">
-            <ol class="features section-main">
+            <ol class="features">
                 <li class="features__item">
                     <span class="features__item_dark">©️</span>Лучший вкус кофе
                     <img class="features__img" src="img/feature-1.jpg" alt="#">
@@ -298,7 +299,7 @@ $has_items_in_cart = !empty($cart_quantities);
                     </li>
                 <?php endwhile; ?>
             </ul>
-            <a class="popular__link btn-primary btn-primary__knop" href="Меню/index.php">Еще...</a>
+            <a class="popular__link btn-primary btn-primary__knop" href="Продукты/index.php#menu-section">Еще...</a>
         </div>
     </section>
         <section id="testimonial-section" class="section-main testimonial-carousel">
@@ -391,24 +392,14 @@ $has_items_in_cart = !empty($cart_quantities);
                             <div class="news-card__content">
                                 <h3 class="news-card__title"><?php echo htmlspecialchars($news_item['title']); ?></h3>
                                 <p class="news-card__text"><?php echo htmlspecialchars($news_item['content_preview']); ?></p>
-                                <a class="news-card__link" href="Новости/news_detail.php?id=<?php echo $news_item['id']; ?>">Читать далее<span class="material-icons-outlined">arrow_forward</span></a>
+                                <a class="news-card__link" href="Новости/news_detail.php?id=<?php echo $news_item['id']; ?>&from=main">Читать далее<span class="material-icons-outlined">arrow_forward</span></a>
                             </div>
                         </div>
                     <?php endwhile; ?>
                 </div>
             </div>
         </section>
-        <footer id="footer-section">
-            <div class="container">
-                <div class="footer">
-                </div>
-            </div>
-            <div class="footer-copyright">
-                <div class="container">
-                    <p class="footer-copyright__text">e-Wiwonti © 2025. Все права защищены</p>
-                </div>
-            </div>
-        </footer>
+        <?php include_once 'footer.php'; ?>
     </main>
     <script>
         $(document).ready(function() {

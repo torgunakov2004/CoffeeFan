@@ -1,38 +1,144 @@
 <?php
 session_start();
-require_once '../config/connect.php'; // Подключение к базе данных
+require_once '../config/connect.php';
 
 if (isset($_GET['id'])) {
     $id = intval($_GET['id']);
-    $news_item = mysqli_fetch_assoc(mysqli_query($connect, "SELECT * FROM `news` WHERE `id` = '$id'"));
+    $stmt_news = $connect->prepare("SELECT n.*, u.first_name, u.last_name FROM `news` n LEFT JOIN `user` u ON n.author_id = u.id WHERE n.`id` = ?");
+    if ($stmt_news === false) {
+        die("Ошибка подготовки запроса к БД (новости): " . htmlspecialchars($connect->error));
+    }
+    $stmt_news->bind_param("i", $id);
+    $stmt_news->execute();
+    $news_item_result = $stmt_news->get_result();
+    $news_item = $news_item_result->fetch_assoc();
+    $stmt_news->close();
 
     if (!$news_item) {
         die("Новость не найдена.");
     }
+
+    $current_news_id_for_nav = intval($news_item['id']);
+    $current_date_for_nav = $news_item['date'];
+
+    $stmt_prev = $connect->prepare("SELECT id, title FROM news WHERE (date > ?) OR (date = ? AND id > ?) ORDER BY date ASC, id ASC LIMIT 1");
+    if ($stmt_prev) {
+        $stmt_prev->bind_param("ssi", $current_date_for_nav, $current_date_for_nav, $current_news_id_for_nav);
+        $stmt_prev->execute();
+        $prev_news_result = $stmt_prev->get_result();
+        $prev_news = $prev_news_result->fetch_assoc();
+        $stmt_prev->close();
+    } else {
+        $prev_news = null;
+    }
+
+    $stmt_next = $connect->prepare("SELECT id, title FROM news WHERE (date < ?) OR (date = ? AND id < ?) ORDER BY date DESC, id DESC LIMIT 1");
+    if ($stmt_next) {
+        $stmt_next->bind_param("ssi", $current_date_for_nav, $current_date_for_nav, $current_news_id_for_nav);
+        $stmt_next->execute();
+        $next_news_result = $stmt_next->get_result();
+        $next_news = $next_news_result->fetch_assoc();
+        $stmt_next->close();
+    } else {
+        $next_news = null;
+    }
+
+    $stmt_images = $connect->prepare("SELECT `image_path` FROM `news_images` WHERE `news_id` = ? ORDER BY `id` ASC");
+    if ($stmt_images) {
+        $stmt_images->bind_param("i", $id);
+        $stmt_images->execute();
+        $slider_images_result = $stmt_images->get_result();
+        $slider_images = [];
+        while ($img_row = $slider_images_result->fetch_assoc()) {
+            $slider_images[] = $img_row['image_path'];
+        }
+        $stmt_images->close();
+    } else {
+        $slider_images = [];
+    }
+
+    if (empty($slider_images) && !empty($news_item['image'])) {
+        $slider_images[] = $news_item['image'];
+    }
+
+    $cart_quantities = [];
+    if (isset($_SESSION['user']) && isset($_SESSION['user']['id'])) {
+        $user_id = $_SESSION['user']['id'];
+        $query_cart = "SELECT product_id, quantity FROM cart WHERE user_id = ?";
+        $stmt_cart = $connect->prepare($query_cart);
+        if($stmt_cart) {
+            $stmt_cart->bind_param("i", $user_id);
+            $stmt_cart->execute();
+            $result_cart = $stmt_cart->get_result();
+            while ($row_cart = $result_cart->fetch_assoc()) {
+                $cart_quantities[$row_cart['product_id']] = $row_cart['quantity'];
+            }
+            $stmt_cart->close();
+        }
+    }
+    $has_items_in_cart = !empty($cart_quantities);
+
+    $stmt_comments = $connect->prepare("SELECT nc.*, u.avatar as user_avatar FROM `news_comments` nc LEFT JOIN `user` u ON nc.user_id = u.id WHERE nc.`news_id` = ? AND nc.`is_approved` = 1 ORDER BY nc.`created_at` DESC");
+    if ($stmt_comments) {
+        $stmt_comments->bind_param("i", $id);
+        $stmt_comments->execute();
+        $comments_result = $stmt_comments->get_result();
+        $comments = [];
+        while ($comment_row = $comments_result->fetch_assoc()) {
+            $comments[] = $comment_row;
+        }
+        $stmt_comments->close();
+    } else {
+        $comments = [];
+    }
+
+    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit_comment'])) {
+        $comment_text = trim(filter_input(INPUT_POST, 'comment_text', FILTER_SANITIZE_STRING));
+        $author_name = "Гость";
+        $user_id_comment = NULL;
+
+        if (isset($_SESSION['user']) && isset($_SESSION['user']['name']) && isset($_SESSION['user']['id'])) {
+            $author_name = htmlspecialchars($_SESSION['user']['name']);
+            $user_id_comment = $_SESSION['user']['id'];
+        } elseif (!empty($_POST['author_name'])) {
+            $author_name = trim(filter_input(INPUT_POST, 'author_name', FILTER_SANITIZE_STRING));
+        }
+
+        if (!empty($comment_text) && !empty($author_name)) {
+            $stmt_add_comment = $connect->prepare("INSERT INTO `news_comments` (`news_id`, `user_id`, `author_name`, `comment_text`, `is_approved`) VALUES (?, ?, ?, ?, 1)");
+            if ($stmt_add_comment) {
+                $stmt_add_comment->bind_param("iiss", $id, $user_id_comment, $author_name, $comment_text);
+                if ($stmt_add_comment->execute()) {
+                    header("Location: news_detail.php?id=" . $id . "#comments-section");
+                    exit();
+                } else {
+                    $comment_error = "Ошибка добавления комментария: " . $stmt_add_comment->error;
+                }
+                $stmt_add_comment->close();
+            } else {
+                 $comment_error = "Ошибка подготовки запроса для добавления комментария.";
+            }
+        } else {
+            $comment_error = "Пожалуйста, заполните все поля комментария.";
+        }
+    }
+
 } else {
     die("ID новости не указан.");
 }
 
-    // Получаем количество товаров в корзине для текущего пользователя
-    $cart_quantities = [];
-    if (isset($_SESSION['user'])) {
-        $user_id = $_SESSION['user']['id'];
-        $query = "SELECT product_id, quantity FROM cart WHERE user_id = ?";
-        $stmt = $connect->prepare($query);
-        $stmt->bind_param("i", $user_id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        while ($row = $result->fetch_assoc()) {
-            $cart_quantities[$row['product_id']] = $row['quantity'];
-        }
-    }
+$page_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+$page_title_encoded = urlencode($news_item['title']);
 
-    // Проверка наличия товаров в корзине
-    $has_items_in_cart = !empty($cart_quantities);
+$back_url = 'index.php'; 
+if (isset($_GET['from']) && $_GET['from'] === 'main') {
+    $back_url = '../index.php#latest-news-section'; 
+} elseif (isset($_SERVER['HTTP_REFERER']) && !empty($_SERVER['HTTP_REFERER'])) {
+  
+}
 ?>
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -40,40 +146,30 @@ if (isset($_GET['id'])) {
     <title><?php echo htmlspecialchars($news_item['title']); ?></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Icons+Outlined">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
     <link rel="stylesheet" href="style.css">
 </head>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <body>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+
     <header id="header-section">
         <div class="container container-header">
             <div class="header">
                 <nav class="nav-main">
                     <ul class="nav-main__list">
-                        <li class="nav-main__item">
-                            <a class="nav-main__link" href="../index.php">Главная</a>
-                        </li>
-                        <li class="nav-main__item">
-                            <a class="nav-main__link" href="../Новости/index.php">Новости</a>
-                        </li>
-                        <li class="nav-main__item">
-                            <a class="nav-main__link" href="../Рецепты/index.php">Рецепты</a>
-                        </li>
-                        <li class="nav-main__item">
-                        <a class="nav-main__link" href="../Акции/index.php">Акции</a>
-                        </li>
+                        <li class="nav-main__item"> <a class="nav-main__link" href="../index.php">Главная</a> </li>
+                        <li class="nav-main__item"> <a class="nav-main__link" href="../Продукты/index.php">Продукты</a> </li>
+                        <li class="nav-main__item"> <a class="nav-main__link" href="../Рецепты/index.php">Рецепты</a> </li>
+                        <li class="nav-main__item"> <a class="nav-main__link" href="../Акции/index.php">Акции</a> </li>
                     </ul>
                     <img class="header__logo" src="../img/logo.svg" alt="#">
                     <ul class="nav-main__list">
-                        <li class="nav-main__item">
-                            <a class="nav-main__link" href="../О кофе/index.php">О кофе</a>
-                        </li>
-                        <li class="nav-main__item">
-                            <a class="nav-main__link" href="../Новости/index.php">Новости</a>
-                        </li>
-                        <li class="nav-main__item">
-                            <a class="nav-main__link" href="../Контакты/index.php">Контакты</a>
-                        </li>
+                        <li class="nav-main__item"> <a class="nav-main__link" href="../О кофе/index.php">О кофе</a> </li>
+                        <li class="nav-main__item"> <a class="nav-main__link nav-main__link_selected" href="index.php">Новости</a> </li>
+                        <li class="nav-main__item"> <a class="nav-main__link" href="../Контакты/index.php">Контакты</a> </li>
                     </ul>
                 </nav>
                 <div class="header-action">
@@ -82,106 +178,189 @@ if (isset($_GET['id'])) {
                 </a>
                 <nav class="profile">
                     <nav class="account">
-                        <img src="<?php echo $_SESSION['user']['avatar'] ?? '../img/icons8.png'; ?>" class="profile-avatar" alt="Аватар профиля">
+                        <img src="<?php echo (isset($_SESSION['user']['avatar']) && !empty($_SESSION['user']['avatar'])) ? htmlspecialchars($_SESSION['user']['avatar']) : '../img/icons8.png'; ?>" class="profile-avatar">
                     </nav>
-                        <?php if (!$_SESSION): ?>
-                            <ul class="submenu">
-                                <li><a class="log" href="../auth/authorization.php">Вход</a></li>
-                                <li><a class="log" href="../auth/register.php">Регистрация</a></li>
-                            </ul>
-                        <?php else: ?>
-                            <ul class="submenu">
-                                <li class="user-info">
-                                <div class="user-avatar">
-                                    <img src="<?php echo $_SESSION['user']['avatar'] ?? '../img/default-avatar.jpg'; ?>" alt="Аватар">
-                                </div>
-                                    <div class="user-details">
+                    <?php if (!isset($_SESSION['user'])): ?>
+                        <ul class="submenu">
+                            <li><a class="log" href="../auth/authorization.php">Вход</a></li>
+                            <li><a class="log" href="../auth/register.php">Регистрация</a></li>
+                        </ul>
+                    <?php else: ?>
+                        <ul class="submenu">
+                            <li class="user-info">
+                                <div class="user-avatar"> <img src="<?php echo $_SESSION['user']['avatar'] ?? '../img/default-avatar.jpg'; ?>" alt="Аватар"> </div>
+                                <div class="user-details">
                                     <span class="user-name"><?= htmlspecialchars($_SESSION["user"]['first_name'] ?? ($_SESSION["user"]['name'] ?? 'Пользователь')) ?></span>
-                                        <span class="user-email"><?= htmlspecialchars($_SESSION["user"]['email']) ?></span>
-                                    </div>
-                                </li>
+                                    <span class="user-email"><?= htmlspecialchars($_SESSION["user"]['email'] ?? '') ?></span>
+                                </div>
+                            </li>
+                            <li class="menu-divider"></li>
+                            <li><a class="menu-item" href="../profile.php"><i class="icon-user"></i>Мой профиль</a></li>
+                            <li><a class="menu-item" href="../orders.php"><i class="icon-orders"></i>Мои заказы</a></li>
+                            <li><a class="menu-item" href="../favorites.php"><i class="icon-heart"></i>Избранное</a></li>
+                            <?php if (isset($_SESSION['user']['is_admin']) && $_SESSION['user']['is_admin']): ?>
                                 <li class="menu-divider"></li>
-                                <li><a class="menu-item" href="profile.php"><i class="icon-user"></i>Мой профиль</a></li>
-                                <li><a class="menu-item" href="orders.php"><i class="icon-orders"></i>Мои заказы</a></li>
-                                <li><a class="menu-item" href="favorites.php"><i class="icon-heart"></i>Избранное</a></li>
-                                <?php if (isset($_SESSION['user']['is_admin']) && $_SESSION['user']['is_admin']): ?>
-                                    <li class="menu-divider"></li>
-                                    <li><a class="menu-item admin" href="../admin/admin_dashboard.php"><i class="icon-admin"></i>Админ-панель</a></li>
-                                <?php endif; ?>
-                                <li class="menu-divider"></li>
-                                <li><a class="menu-item logout" href="../config/logout.php"><i class="icon-logout"></i>Выход</a></li>
-                            </ul>
-                        <?php endif; ?>
-                    </nav>
+                                <li><a class="menu-item admin" href="../admin/admin_dashboard.php"><i class="icon-admin"></i>Админ-панель</a></li>
+                            <?php endif; ?>
+                            <li class="menu-divider"></li>
+                            <li><a class="menu-item logout" href="../config/logout.php"><i class="icon-logout"></i>Выход</a></li>
+                        </ul>
+                    <?php endif; ?>
+                </nav>
                 </div>
             </div>
         </div>
     </header>
-    <?php
-        // Получение ID текущей новости
-        $current_id = intval($_GET['id']);
 
-        // Получение предыдущей и следующей новостей
-        $prev_news = mysqli_fetch_assoc(mysqli_query($connect, "SELECT * FROM `news` WHERE `id` < '$current_id' ORDER BY `id` DESC LIMIT 1"));
-        $next_news = mysqli_fetch_assoc(mysqli_query($connect, "SELECT * FROM `news` WHERE `id` > '$current_id' ORDER BY `id` ASC LIMIT 1"));
-    ?>
     <main>
         <div class="container">
-            <div class="news-card_detail">
-                <img src="<?php echo htmlspecialchars($news_item['image']); ?>" alt="<?php echo htmlspecialchars($news_item['title']); ?>" class="news-image">
-                <h2 class="news-title"><?php echo htmlspecialchars($news_item['title']); ?></h2>
-                <time class="news-date"><?php echo date('d.m.Y H:i', strtotime($news_item['date'])); ?></time>
-                <p class="news-content"><?php echo nl2br(htmlspecialchars($news_item['content'])); ?></p>
-                <div class="navigation-buttons">
-                    <?php if ($next_news): ?>
-                        <a href="news_detail.php?id=<?php echo $next_news['id']; ?>" class="btn-primary">
-                            <span class="material-icons-outlined">arrow_back</span> Предыдущая
-                        </a>                 
+            <div class="page-standalone-back-button-wrapper">
+                <a href="<?php echo htmlspecialchars($back_url); ?>" class="page-header__back-button-textual" title="Вернуться назад">
+                    <span class="material-icons-outlined">arrow_back_ios_new</span> Вернуться назад
+                </a>
+            </div>
+            <h1 class="section-subtitle news-detail__main-title-override"><?php echo htmlspecialchars($news_item['title']); ?></h1>
+
+            <article class="news-card_detail">
+                <?php if (!empty($slider_images)): ?>
+                <div class="news-slider-container">
+                    <div class="swiper-container news-swiper">
+                        <div class="swiper-wrapper">
+                            <?php foreach ($slider_images as $image_path): ?>
+                                <div class="swiper-slide"> <img src="<?php echo htmlspecialchars($image_path); ?>" alt="<?php echo htmlspecialchars($news_item['title']); ?>"> </div>
+                            <?php endforeach; ?>
+                        </div>
+                        <div class="swiper-pagination"></div>
+                        <div class="swiper-button-next"></div>
+                        <div class="swiper-button-prev"></div>
+                    </div>
+                </div>
+                <?php elseif (!empty($news_item['image'])): ?>
+                    <img src="<?php echo htmlspecialchars($news_item['image']); ?>" alt="<?php echo htmlspecialchars($news_item['title']); ?>" class="news-image">
+                <?php endif; ?>
+
+                <time class="news-date">
+                    Опубликовано: <?php echo date('d.m.Y H:i', strtotime($news_item['date'])); ?>
+                    <?php if (isset($news_item['author_id']) && isset($news_item['first_name']) && $news_item['first_name'] !== null): ?>
+                        | Автор: <?php echo htmlspecialchars($news_item['first_name'] . (isset($news_item['last_name']) ? ' ' . $news_item['last_name'] : '')); ?>
                     <?php endif; ?>
+                </time>
+
+                <div class="news-content">
+                    <?php
+                    $content_raw = $news_item['content'];
+                    $content_html = nl2br(htmlspecialchars($content_raw, ENT_QUOTES, 'UTF-8'));
+                    $content_html = preg_replace('/\[h2\](.*?)\[\/h2\]/s', '<h2>$1</h2>', $content_html);
+                    $content_html = preg_replace('/\[h3\](.*?)\[\/h3\]/s', '<h3>$1</h3>', $content_html);
+                    $content_html = preg_replace_callback('/\[quote\](.*?)\[\/quote\]/s', function($matches) {
+                        return '<blockquote><p>' . $matches[1] . '</p></blockquote>';
+                    }, $content_html);
+                    $content_html = preg_replace_callback('/\[ul\](.*?)\[\/ul\]/s', function($matches) {
+                        $items = preg_replace('/\[li\](.*?)\[\/li\]/s', '<li>$1</li>', $matches[1]);
+                        return '<ul>' . $items . '</ul>';
+                    }, $content_html);
+                    $content_html = preg_replace_callback('/\[ol\](.*?)\[\/ol\]/s', function($matches) {
+                        $items = preg_replace('/\[li\](.*?)\[\/li\]/s', '<li>$1</li>', $matches[1]);
+                        return '<ol>' . $items . '</ol>';
+                    }, $content_html);
                     
-                    <a href="index.php" class="btn-primary">Назад к новостям</a>
-                    
-                    <?php if ($prev_news): ?>
-                        <a href="news_detail.php?id=<?php echo $prev_news['id']; ?>" class="btn-primary">
-                            Следующая <span class="material-icons-outlined">arrow_forward</span>
-                        </a>                 
+                    echo $content_html;
+                    ?>
+                    <?php if (!empty($news_item['video_url'])): ?>
+                        <div class="video-container"> <iframe src="<?php echo htmlspecialchars($news_item['video_url']); ?>" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> </div>
                     <?php endif; ?>
                 </div>
-            </div>
+
+                <div class="share-buttons">
+                    <p>Поделиться новостью:</p>
+                    <a href="https://vk.com/share.php?url=<?php echo urlencode($page_url); ?>&title=<?php echo $page_title_encoded; ?>" target="_blank" class="share-button vk" title="Поделиться ВКонтакте"><i class="fab fa-vk"></i></a>
+                    <a href="https://t.me/share/url?url=<?php echo urlencode($page_url); ?>&text=<?php echo $page_title_encoded; ?>" target="_blank" class="share-button telegram" title="Поделиться в Telegram"><i class="fab fa-telegram-plane"></i></a>
+                    <a href="https://api.whatsapp.com/send?text=<?php echo $page_title_encoded . ' ' . urlencode($page_url); ?>" target="_blank" class="share-button whatsapp" title="Поделиться в WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                    <button type="button" class="share-button copy-link" title="Скопировать ссылку" data-link="<?php echo htmlspecialchars($page_url); ?>"><i class="fas fa-link"></i></button>
+                </div>
+                
+                <div class="navigation-buttons">
+                    <?php if ($prev_news): ?>
+                        <a href="news_detail.php?id=<?php echo $prev_news['id']; ?>" class="btn-primary"> <span class="material-icons-outlined">arrow_back</span> Предыдущая </a>
+                    <?php else: ?>
+                        <span class="btn-primary disabled-nav-button"> <span class="material-icons-outlined">arrow_back</span> Предыдущая </span>
+                    <?php endif; ?>
+                    <?php if ($next_news): ?>
+                        <a href="news_detail.php?id=<?php echo $next_news['id']; ?>" class="btn-primary"> Следующая <span class="material-icons-outlined">arrow_forward</span> </a>
+                    <?php else: ?>
+                         <span class="btn-primary disabled-nav-button"> Следующая <span class="material-icons-outlined">arrow_forward</span> </span>
+                    <?php endif; ?>
+                </div>
+
+                <section id="comments-section">
+                    <h2 class="comments-title">Комментарии (<?php echo count($comments); ?>)</h2>
+                    <div class="comment-form">
+                        <form action="news_detail.php?id=<?php echo $id; ?>#comments-section" method="POST">
+                            <?php if (isset($comment_error)): ?> <p class="comment-error"><?php echo htmlspecialchars($comment_error); ?></p> <?php endif; ?>
+                            <?php if (!isset($_SESSION['user'])): ?>
+                            <div class="form-group"> <label for="author_name">Ваше имя:</label> <input type="text" name="author_name" id="author_name" required> </div>
+                            <?php endif; ?>
+                            <div class="form-group"> <label for="comment_text">Ваш комментарий:</label> <textarea name="comment_text" id="comment_text" required></textarea> </div>
+                            <button type="submit" name="submit_comment" class="btn-primary">Отправить</button>
+                        </form>
+                    </div>
+                    <?php if (!empty($comments)): ?>
+                        <ul class="comment-list">
+                            <?php foreach ($comments as $comment): ?>
+                                <li class="comment-item">
+                                    <div class="comment-avatar"> <img src="<?php echo (!empty($comment['user_avatar'])) ? htmlspecialchars($comment['user_avatar']) : '../img/default-avatar.jpg'; ?>" alt="Аватар"> </div>
+                                    <div class="comment-content">
+                                        <p class="comment-author"><?php echo htmlspecialchars($comment['author_name']); ?></p>
+                                        <p class="comment-date"><?php echo date('d.m.Y в H:i', strtotime($comment['created_at'])); ?></p>
+                                        <p class="comment-text"><?php echo nl2br(htmlspecialchars($comment['comment_text'])); ?></p>
+                                    </div>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    <?php else: ?>
+                        <p class="no-comments">Комментариев пока нет. Будьте первым!</p>
+                    <?php endif; ?>
+                </section>
+            </article>
         </div>
     </main>
-
-    <footer id="footer-section">
-        <div class="container">
-            <div class="footer">
-                <img class="footer__img" src="../img/logo.svg" alt="#">
-                <ul class="footer__list">
-                    <li class="footer__item">
-                        <a class="footer__link" href="../index.php">Главная</a>
-                    </li>
-                    <li class="footer__item">
-                        <a class="footer__link" href="../Рецепты/index.php">Рецепты</a>
-                    </li>
-                    <li class="footer__item">
-                        <a class="footer__link" href="../Продукты/index.php">Продукты</a>
-                    </li>
-                    <li class="footer__item">
-                        <a class="footer__link" href="../Меню/index.php">Меню</a>
-                    </li>
-                    <li class="footer__item">
-                        <a class="footer__link" href="../Тесты/index.php">Тесты</a>
-                    </li>
-                    <li class="footer__item">
-                        <a class="footer__link" href="../Контакты/index.php">Контакты</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-        <div class="footer-copyright">
-            <div class="container">
-                <p class="footer-copyright__text">e-Wiwonti © 2025. Все права защищены</p>
-            </div>
-        </div>
-    </footer>
+    <?php include_once '../footer.php'; ?>
+<script>
+    var swiper = new Swiper('.news-swiper', {
+        loop: true, grabCursor: true, pagination: { el: '.swiper-pagination', clickable: true, },
+        navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev', },
+        autoplay: { delay: 5000, disableOnInteraction: false, },
+    });
+    document.addEventListener('DOMContentLoaded', function() {
+        const copyButton = document.querySelector('.copy-link');
+        if (copyButton) {
+            copyButton.addEventListener('click', function() {
+                const linkToCopy = this.dataset.link;
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(linkToCopy).then(function() {
+                        if (typeof toastr !== 'undefined') { toastr.success('Ссылка скопирована!'); }
+                    }).catch(function(err) { tryAlternativeCopy(linkToCopy); });
+                } else { tryAlternativeCopy(linkToCopy); }
+            });
+        }
+        function tryAlternativeCopy(textToCopy) {
+            const textArea = document.createElement("textarea");
+            textArea.value = textToCopy;
+            textArea.style.position = "fixed"; textArea.style.left = "-9999px";
+            document.body.appendChild(textArea);
+            textArea.focus(); textArea.select();
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    if (typeof toastr !== 'undefined') { toastr.success('Ссылка скопирована (fallback)!'); }
+                } else { throw new Error('Fallback copy failed'); }
+            } catch (err) {
+                if (typeof toastr !== 'undefined') { toastr.error('Не удалось скопировать ссылку. Пожалуйста, скопируйте вручную.'); }
+                else { alert('Не удалось скопировать ссылку. Пожалуйста, скопируйте вручную.'); }
+            }
+            document.body.removeChild(textArea);
+        }
+    });
+</script>
 </body>
 </html>
