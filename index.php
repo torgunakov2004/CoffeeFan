@@ -135,7 +135,7 @@ $has_items_in_cart = !empty($cart_quantities);
                             <li class="menu-divider"></li>
                             <li><a class="menu-item" href="profile/profile.php"><i class="icon-user"></i>Мой профиль</a></li>
                             <li><a class="menu-item" href="profile/orders.php"><i class="icon-orders"></i>Мои заказы</a></li>
-                            <li><a class="menu-item" href="profile/favorites.php"><i class="icon-heart"></i>Избранное</a></li>
+                            <li><a class="menu-item" href="profile/support.php"><i class="icon-heart"></i>Поддержка</a></li>
                             <?php if ($_SESSION['admin']): ?>
                                 <li class="menu-divider"></li>
                                 <li><a class="menu-item admin" href="admin/admin_dashboard.php"><i class="icon-admin"></i>Админ-панель</a></li>
