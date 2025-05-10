@@ -58,83 +58,10 @@ if (isset($_SESSION['user']['id'])) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <header id="header-section">
-        <div class="container container-header">
-            <div class="header">
-                 <nav class="nav-main">
-                    <ul class="nav-main__list">
-                        <li class="nav-main__item"><a class="nav-main__link" href="../index.php">Главная</a></li>
-                        <li class="nav-main__item"><a class="nav-main__link" href="../Продукты/index.php">Продукты</a></li>
-                        <li class="nav-main__item"><a class="nav-main__link" href="../Рецепты/index.php">Рецепты</a></li>
-                        <li class="nav-main__item"><a class="nav-main__link" href="../Акции/index.php">Акции</a></li>
-                    </ul>
-                        <img class="header__logo" src="../img/logo.svg" alt="CoffeeeFan Logo">
-                    <ul class="nav-main__list">
-                        <li class="nav-main__item"><a class="nav-main__link" href="../О кофе/index.php">О кофе</a></li>
-                        <li class="nav-main__item"><a class="nav-main__link" href="../Новости/index.php">Новости</a></li>
-                        <li class="nav-main__item"><a class="nav-main__link" href="../Контакты/index.php">Контакты</a></li>
-                    </ul>
-                </nav>
-                 <div class="header-action">
-                    <a href="../local_mall.php">
-                        <button class="header-action__cart-1 material-icons-outlined <?php echo $has_items_in_cart ? 'active' : ''; ?>" title="Корзина">shopping_cart</button>
-                    </a>
-                    <nav class="profile">
-                        <nav class="account">
-                             <?php
-                                $avatar_path_header = '../img/icons8.png';
-                                if (isset($_SESSION['user']['avatar']) && !empty($_SESSION['user']['avatar'])) {
-                                    $path_check = '../' . $_SESSION['user']['avatar'];
-                                    if (file_exists($path_check)) {
-                                        $avatar_path_header = htmlspecialchars($path_check);
-                                    }
-                                }
-                             ?>
-                             <img src="<?php echo $avatar_path_header; ?>" class="profile-avatar" alt="Профиль">
-                        </nav>
-                         <?php if (!isset($_SESSION['user'])): ?>
-                            <ul class="submenu">
-                                <li><a class="log" href="../auth/authorization.php">Вход</a></li>
-                                <li><a class="log" href="../auth/register.php">Регистрация</a></li>
-                            </ul>
-                        <?php else: ?>
-                            <ul class="submenu">
-                                <li class="user-info">
-                                    <div class="user-avatar">
-                                        <?php
-                                            $avatar_submenu_path = '../img/default-avatar.jpg';
-                                            if (isset($_SESSION['user']['avatar']) && !empty($_SESSION['user']['avatar'])) {
-                                                $path_check_submenu = '../' . $_SESSION['user']['avatar'];
-                                                if (file_exists($path_check_submenu)) {
-                                                    $avatar_submenu_path = htmlspecialchars($path_check_submenu);
-                                                }
-                                            }
-                                        ?>
-                                        <img src="<?php echo $avatar_submenu_path; ?>" alt="Аватар">
-                                    </div>
-                                    <div class="user-details">
-                                        <span class="user-name"><?= htmlspecialchars($_SESSION["user"]['first_name'] ?? ($_SESSION["user"]['name'] ?? 'Пользователь')) ?></span>
-                                        <span class="user-email"><?= htmlspecialchars($_SESSION["user"]['email'] ?? '') ?></span>
-                                    </div>
-                                </li>
-                                <li class="menu-divider"></li>
-                                <li><a class="menu-item" href="profile.php"><i class="icon-user"></i>Мой профиль</a></li>
-                                <li><a class="menu-item" href="orders.php"><i class="icon-orders"></i>Мои заказы</a></li>
-                                <li><a class="menu-item" href="support.php"><i class="icon-heart"></i>Поддержка</a></li> 
-                                <?php if (isset($_SESSION['user']['is_admin']) && $_SESSION['user']['is_admin']): ?>
-                                    <li class="menu-divider"></li>
-                                    <li><a class="menu-item admin" href="../admin/admin_dashboard.php"><i class="icon-admin"></i>Админ-панель</a></li>
-                                <?php endif; ?>
-                                <li class="menu-divider"></li>
-                                <li><a class="menu-item logout" href="../config/logout.php"><i class="icon-logout"></i>Выход</a></li>
-                            </ul>
-                        <?php endif; ?>
-                    </nav>
-                </div>
-            </div>
-        </div>
-    </header>
-
+    <?php
+        $current_page_is_faq = true; 
+        include_once '../header_footer_elements/header.php'; 
+    ?>
     <main class="profile-page-main-v2 support-chat-page">
         <div class="support-chat-container">
             <div class="chat-header">

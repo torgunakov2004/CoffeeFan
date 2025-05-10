@@ -536,10 +536,10 @@ if ($current_script_path_footer === '/' ) {
                     <div class="f_widget about-widget pl_70">
                         <h3 class="f-title f_600 t_color f_size_18">Помощь</h3>
                         <ul class="list-unstyled f_list">
-                            <li><a href="<?php echo $baseUrl_footer; ?>faq.php">FAQ</a></li>
-                            <li><a href="<?php echo $baseUrl_footer; ?>terms.php">Условия использования</a></li>
-                            <li><a href="<?php echo $baseUrl_footer; ?>support.php">Политика поддержки</a></li>
-                            <li><a href="<?php echo $baseUrl_footer; ?>privacy.php">Конфиденциальность</a></li>
+                            <li><a href="<?php echo $baseUrl_footer; ?>list_footer/faq.php">FAQ</a></li>
+                            <li><a href="<?php echo $baseUrl_footer; ?>list_footer/terms.php">Условия использования</a></li>
+                            <li><a href="<?php echo $baseUrl_footer; ?>list_footer/support_policy.php">Политика поддержки</a></li> 
+                            <li><a href="<?php echo $baseUrl_footer; ?>list_footer/privacy.php">Конфиденциальность</a></li>
                         </ul>
                     </div>
                 </div>
@@ -561,7 +561,6 @@ if ($current_script_path_footer === '/' ) {
                 </div>
             </div>
         </div>
-        <!-- HTML ДЛЯ АНИМАЦИИ ФОНА ИЗ СТАРОГО ФУТЕРА (машинка, велосипедист) -->
         <div class="footer_bg">
             <div class="footer_bg_one"></div>
             <div class="footer_bg_two"></div>
