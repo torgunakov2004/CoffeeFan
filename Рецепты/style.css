@@ -89,10 +89,6 @@ input:focus {
     padding: 0 75px;
     position: relative; /* Added for absolute positioning of back button */
 }
-.container-header {
-    padding: 0 10px;
-    position: static; /* Override relative positioning for header container */
-}
 .section-main {
     padding-top: 50px;
 }
