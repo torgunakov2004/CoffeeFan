@@ -1,0 +1,267 @@
+/* profile_style_v2.css */
+
+body {
+    /* Основные стили body уже есть в style.css */
+    /* Если нужно что-то специфичное для страницы профиля, можно добавить сюда */
+}
+
+.profile-page-main-v2 {
+    padding: 40px 20px; /* Отступы для всей страницы */
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Выравнивание карточки по верху, если она не на всю высоту */
+}
+
+.profile-card-container {
+    width: 100%;
+    max-width: 650px; /* Ширина карточки профиля */
+}
+
+.profile-card {
+    background: linear-gradient(145deg, #221e1b, #1a1714); /* Более темный градиент */
+    border-radius: 15px;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4), 
+                inset 0 0 15px rgba(0,0,0,0.2); /* Глубокая тень и внутренняя тень */
+    overflow: hidden; /* Чтобы скругления работали с внутренними элементами */
+    border: 1px solid #332c25; /* Темная рамка */
+}
+
+.profile-card-header {
+    background-color: #1c1814; /* Фон для шапки карточки */
+    padding: 30px;
+    display: flex;
+    align-items: center;
+    gap: 25px; /* Расстояние между аватаром и текстом */
+    border-bottom: 1px solid #332c25;
+}
+
+.profile-card-avatar {
+    width: 100px; /* Размер аватара */
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #C99E71; /* Акцентная рамка аватара */
+    box-shadow: 0 4px 15px rgba(201, 158, 113, 0.2);
+    transition: transform 0.3s ease;
+}
+.profile-card-avatar:hover {
+    transform: scale(1.05);
+}
+
+.profile-card-userinfo {
+    text-align: left;
+}
+
+.profile-card-name {
+    font-family: 'Righteous', cursive;
+    font-size: 26px;
+    color: #FFFFFF;
+    margin: 0 0 5px 0;
+    line-height: 1.2;
+}
+
+.profile-card-login {
+    font-size: 15px;
+    color: #a0a0a0;
+    margin: 0;
+}
+
+.profile-message-v2 { /* Обновленные стили для сообщений */
+    padding: 12px 20px;
+    margin: 20px 30px 0px 30px; /* Отступы вокруг сообщения */
+    border-radius: 8px;
+    font-size: 14px;
+    text-align: center;
+    border-width: 1px;
+    border-style: solid;
+}
+.profile-message-v2.success {
+    background-color: rgba(92, 184, 92, 0.1);
+    color: #6dc06d;
+    border-color: rgba(92, 184, 92, 0.3);
+}
+.profile-message-v2.error {
+    background-color: rgba(217, 83, 79, 0.1);
+    color: #e86e6b;
+    border-color: rgba(217, 83, 79, 0.3);
+}
+
+
+.profile-card-tabs {
+    display: flex;
+    background-color: #1a1714; /* Фон для вкладок */
+    padding: 0 15px; /* Немного отступа для самих вкладок */
+    border-bottom: 1px solid #332c25;
+}
+
+.profile-card-tabs .tab-button {
+    background-color: transparent;
+    border: none;
+    padding: 15px 20px;
+    color: #a0a0a0;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: color 0.3s ease, border-bottom-color 0.3s ease;
+    border-bottom: 3px solid transparent; /* Основа для активной вкладки */
+    margin-bottom: -1px; /* Чтобы линия активной вкладки перекрывала общую границу */
+}
+
+.profile-card-tabs .tab-button:hover {
+    color: #C99E71;
+}
+
+.profile-card-tabs .tab-button.active {
+    color: #C99E71;
+    border-bottom-color: #C99E71;
+}
+
+.profile-card-content {
+    padding: 30px;
+}
+
+.tab-content {
+    display: none; /* По умолчанию все вкладки скрыты */
+}
+
+.tab-content.active {
+    display: block; /* Показываем активную вкладку */
+    animation: fadeInTab 0.5s ease-in-out;
+}
+
+@keyframes fadeInTab {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.tab-content-title {
+    font-family: 'Urbanist', sans-serif;
+    font-size: 20px;
+    color: #C99E71;
+    margin-bottom: 25px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #444;
+}
+
+.profile-form-v2 .form-group-v2 {
+    margin-bottom: 22px;
+}
+.profile-form-v2 .form-button-container-v2 {
+    text-align: center; /* Центрируем инлайновые/инлайн-блочные элементы внутри */
+    margin-top: 25px; /* Отступ над контейнером кнопки */
+}
+
+.profile-form-v2 label {
+    display: block;
+    font-size: 13px;
+    color: #b0b0b0;
+    margin-bottom: 7px;
+    font-weight: 500;
+}
+
+.profile-form-v2 input[type="text"],
+.profile-form-v2 input[type="email"],
+.profile-form-v2 input[type="password"],
+.profile-form-v2 input[type="file"].file-input-v2 {
+    width: 100%;
+    padding: 12px 15px;
+    background-color: #14110E; /* Темнее чем фон карточки */
+    border: 1px solid #3a332d; /* Очень темная рамка */
+    border-radius: 6px;
+    color: #FFFFFF;
+    font-size: 15px;
+    font-family: 'Urbanist', sans-serif;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.profile-form-v2 input[type="text"]:focus,
+.profile-form-v2 input[type="email"]:focus,
+.profile-form-v2 input[type="password"]:focus,
+.profile-form-v2 input[type="file"].file-input-v2:focus {
+    border-color: #C99E71;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(201, 158, 113, 0.2);
+}
+
+.profile-form-v2 .readonly-input-v2 {
+    background-color: #282420; /* Фон для нередактируемых полей */
+    color: #888;
+    cursor: not-allowed;
+}
+
+.profile-form-v2 .avatar-upload-group {
+    margin-top: 15px;
+}
+.profile-form-v2 input[type="file"].file-input-v2 {
+    padding: 10px; /* Специальный паддинг для input file */
+    background-color: #1e1a17;
+}
+
+.btn-primary-v2.profile-submit-btn-v2 {
+    display: inline-block; /* Чтобы text-align сработал */
+    background-color: #C99E71;
+    color: #14110E;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    /* margin-top: 15px; Убираем, так как отступ теперь у контейнера */
+    /* width: auto; Уже было или не нужно, т.к. display: inline-block */
+}
+
+.btn-primary-v2.profile-submit-btn-v2:hover {
+    background-color: #bd864b;
+    transform: translateY(-2px);
+}
+
+/* Адаптивность для карточки профиля */
+@media (max-width: 768px) {
+    .profile-page-main-v2 {
+        padding: 20px 10px;
+    }
+    .profile-card-container {
+        max-width: 100%;
+    }
+    .profile-card-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+        padding: 25px;
+    }
+    .profile-card-userinfo {
+        text-align: center;
+    }
+    .profile-card-tabs {
+        padding: 0 10px;
+        overflow-x: auto; /* Для прокрутки вкладок на малых экранах */
+        white-space: nowrap; /* Чтобы вкладки не переносились */
+        -webkit-overflow-scrolling: touch; /* Плавная прокрутка на iOS */
+    }
+    .profile-card-tabs .tab-button {
+        padding: 12px 15px;
+        font-size: 14px;
+    }
+    .profile-card-content {
+        padding: 25px;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-card-avatar {
+        width: 80px;
+        height: 80px;
+    }
+    .profile-card-name {
+        font-size: 22px;
+    }
+    .profile-card-login {
+        font-size: 14px;
+    }
+    .tab-content-title {
+        font-size: 18px;
+    }
+}

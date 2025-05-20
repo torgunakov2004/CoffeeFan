@@ -1,0 +1,111 @@
+/* list_footer/style_info_page.css */
+body {
+    /* Предполагаем, что основные стили body (фон, шрифт) приходят из ../style.css */
+}
+.section-main {
+    margin-top: 70px;
+}
+.info-page-container {
+    padding: 20px 20px;
+    max-width: 900px; /* Ограничим ширину контента для лучшей читаемости */
+    margin: 0 auto; /* Центрируем контейнер */
+    background-color: #1C1814; /* Фон контентной части, если отличается от body */
+    border-radius: 8px; /* Небольшое скругление */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Легкая тень */
+    color: #e0e0e0; /* Цвет текста */
+    line-height: 1.7;
+}
+
+.info-page-container h1,
+.info-page-container .section-subtitle { /* Используем .section-subtitle для заголовка страницы */
+    font-family: 'Righteous', cursive;
+    color: #C99E71;
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #333;
+    /* Убираем линии по бокам, если section-subtitle их добавляет глобально */
+    display: block; 
+    font-size: 28px; /* Размер для H1 */
+}
+/* Если section-subtitle глобально добавляет before/after, их нужно скрыть здесь */
+.info-page-container .section-subtitle::before,
+.info-page-container .section-subtitle::after {
+    display: none;
+}
+
+
+.info-page-container h2 {
+    font-family: 'Righteous', cursive;
+    color: #C99E71;
+    font-size: 22px;
+    margin-top: 30px;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 1px dotted #444;
+}
+
+.info-page-container h3 {
+    font-family: 'Urbanist', sans-serif;
+    font-weight: 600;
+    color: #d0d0d0;
+    font-size: 18px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.info-page-container p {
+    margin-bottom: 15px;
+    text-align: justify;
+}
+
+.info-page-container ul,
+.info-page-container ol {
+    margin-bottom: 15px;
+    padding-left: 30px; /* Отступ для списков */
+}
+
+.info-page-container li {
+    margin-bottom: 8px;
+}
+
+.info-page-container a {
+    color: #C99E71;
+    text-decoration: underline;
+}
+
+.info-page-container a:hover {
+    color: #e6b88a;
+    text-decoration: none;
+}
+
+.info-page-container strong {
+    font-weight: 600;
+    color: #C99E71;
+}
+
+.info-page-container .last-updated {
+    margin-top: 30px;
+    font-size: 0.9em;
+    color: #888;
+    text-align: right;
+    border-top: 1px solid #333;
+    padding-top: 15px;
+}
+
+@media (max-width: 768px) {
+    .info-page-container {
+        padding: 20px 15px;
+    }
+    .info-page-container h1,
+    .info-page-container .section-subtitle {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    .info-page-container h2 {
+        font-size: 20px;
+    }
+    .info-page-container h3 {
+        font-size: 17px;
+    }
+}

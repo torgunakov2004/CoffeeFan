@@ -1,0 +1,507 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Righteous&family=Urbanist:wght@500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Icons+Outlined');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body {
+    color: #FFFFFF;
+    font: 500 16px/28px 'Urbanist', Arial, Helvetica, sans-serif;
+    background-color: #14110E;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+main {
+    flex: 1;
+    margin-bottom: 20px;
+}
+a {
+    color: inherit;
+    text-decoration: none;
+    transition: .4s;
+}
+ul li,
+ol li {
+    list-style-type: none;
+}
+img {
+    max-width: 100%;
+    max-height: 100%;
+    display: block;
+}
+button {
+    display: block;
+    border: none;
+    color: inherit;
+    font: inherit;
+    background-color: transparent;
+    transition: .4s;
+    cursor: pointer;
+}
+input {
+    display: block;
+    padding: 12px 15px;
+    border: 1px solid #333;
+    outline: none;
+    color: #FFFFFF;
+    font: 500 16px 'Urbanist', Arial, Helvetica, sans-serif;
+    background-color: #1C1814;
+    border-radius: 6px;
+    width: 100%;
+    transition: border-color 0.3s ease;
+}
+input:focus {
+    border-color: #C99E71;
+}
+
+.btn-primary {
+    padding: 12px 25px;
+    font: 700 16px 'Inter', Arial, Helvetica, sans-serif;
+    text-align: center;
+    background-color: #C99E71;
+    color: #14110E;
+    border-radius: 6px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    border: none;
+    text-decoration: none;
+}
+.btn-primary:hover {
+    background-color: #bd864b;
+    transform: translateY(-2px);
+}
+.container {
+    max-width: 1340px;
+    margin: 0 auto;
+    padding: 0 75px;
+    position: relative;
+}
+.container-header {
+    padding: 0 10px;
+    position: static;
+}
+.section-title {
+    margin-bottom: 12px;
+    color: #C99E71;
+    font: 600 18px/22px 'Urbanist', Arial, Helvetica, sans-serif;
+    text-align: center;
+}
+.section-subtitle {
+    font-family: 'Urbanist', Arial, Helvetica, sans-serif;
+    font-size: 32px;
+    line-height: 1.4;
+    font-weight: 600;
+    color: #FFFFFF;
+    text-align: center;
+    padding-top: 50px;
+    margin-top: 0;
+    margin-bottom: 40px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.section-subtitle::before,
+.section-subtitle::after {
+    content: '';
+    flex-grow: 1;
+    height: 1px;
+    background-color: #444;
+    margin: 0 20px;
+}
+h2.section-title__h2 {
+    margin-top: 50px;
+    margin-bottom: 15px;
+    font: 600 24px 'Urbanist', Arial, Helvetica, sans-serif;
+    color: #C99E71;
+    text-align: center;
+}
+
+.page-standalone-back-button-wrapper {
+    position: relative;
+    min-height: 1px;
+}
+
+.page-header__back-button-textual {
+    position: static; /* Убираем абсолютное позиционирование */
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #C99E71;
+    text-decoration: none;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: color 0.3s ease;
+    margin-left: 0; /* Убираем левый отступ */
+}
+
+.page-header__back-button-textual .material-icons-outlined {
+    font-size: 20px;
+}
+
+.page-header__back-button-textual:hover {
+    color: #FFFFFF;
+}
+
+.page-standalone-back-button-wrapper {
+    margin-bottom: 20px; /* Добавляем отступ снизу */
+    text-align: left; /* Выравниваем кнопку по левому краю */
+}
+
+@keyframes logo-glow-filter {
+    0% { filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 12px rgba(255, 223, 186, 0.4)); }
+    30% { filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.8)) drop-shadow(0 0 20px rgba(201, 158, 113, 0.3)); }
+    70% { filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 18px rgba(255, 223, 186, 0.5)); }
+    100% { filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 12px rgba(255, 223, 186, 0.4)); }
+}
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+@keyframes cart-pulse {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(201, 158, 113, 0.4); }
+    70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(201, 158, 113, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(201, 158, 113, 0); }
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.recipes-filter-bar { display: flex; gap: 15px; align-items: center; margin-bottom: 40px; }
+.recipes-search-container { flex-grow: 1; position: relative; }
+.recipes-filter-bar .search-input.main-search-input { width: 100%; padding: 10px 12px 10px 40px; font: 500 15px 'Urbanist', Arial, Helvetica, sans-serif; border: 1px solid #444; border-radius: 6px; background-color: #1C1814; color: #FFFFFF; outline: none; transition: border-color 0.3s ease, box-shadow 0.3s ease; height: 42px; opacity: 1; }
+.recipes-filter-bar .search-input.main-search-input:focus { border-color: #C99E71; box-shadow: 0 0 0 3px rgba(201, 158, 113, 0.2); }
+.recipes-filter-bar .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; opacity: 0.6; }
+.my-recipes-button-container { flex-shrink: 0; }
+.btn-my-recipes { display: inline-flex; align-items: center; gap: 8px; padding: 0 18px; height: 42px; font: 600 15px 'Urbanist', Arial, Helvetica, sans-serif; color: #C99E71; background-color: transparent; border: 1px solid #C99E71; border-radius: 6px; cursor: pointer; transition: background-color 0.3s ease, color 0.3s ease; text-decoration: none; white-space: nowrap; }
+.btn-my-recipes .material-icons-outlined { font-size: 20px; }
+.btn-my-recipes:hover { background-color: #C99E71; color: #14110E; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+ul.card-list { padding: 0; margin: 0 auto; list-style-type: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 35px; }
+ul.card-list li { display: block; margin: 0; text-align: left; border-radius: 8px; box-sizing: border-box; overflow: hidden; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); background-color: #1C1814; position: relative; transition: box-shadow 0.3s ease; }
+ul.card-list li:hover { box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35); }
+ul.card-list section { position: relative; overflow: hidden; height: 250px; border-radius: 8px 8px 0 0; }
+ul.card-list img.recipe-image { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s ease; }
+ul.card-list li:hover img.recipe-image { transform: scale(1.1); }
+ul.card-list .content { position: absolute; width: 100%; height: 100%; padding: 20px; top: 0; left: 0; text-align: left; color: #e0e0e0; background: linear-gradient(to top, rgba(20, 17, 14, 0.95) 60%, rgba(20, 17, 14, 0.6)); box-sizing: border-box; transform: translateY(100%); transition: transform .5s ease; display: flex; flex-direction: column; }
+ul.card-list li:hover .content { transform: translateY(0); }
+ul.card-list .content .recipe-content-title { font: 22px/28px 'Righteous', cursive; color: #C99E71; margin: 0 0 15px 0; padding-bottom: 10px; border-bottom: 1px solid #555; }
+ul.card-list .content .recipe-details { flex-grow: 1; overflow-y: auto; margin-bottom: 15px; scrollbar-width: thin; scrollbar-color: #555 #333; }
+ul.card-list .content .recipe-details::-webkit-scrollbar { width: 6px; }
+ul.card-list .content .recipe-details::-webkit-scrollbar-track { background: #333; border-radius: 3px; }
+ul.card-list .content .recipe-details::-webkit-scrollbar-thumb { background-color: #555; border-radius: 3px; }
+ul.card-list .content p { line-height: 1.6; font-size: 14px; padding: 0; margin: 0 0 1em 0; color: #ccc; }
+ul.card-list .content p strong { color: #aaa; font-weight: 600; display: inline-block; margin-bottom: 5px; }
+ul.card-list .content .save-recipe-btn { align-self: center; margin-top: auto; padding: 10px 20px; font-size: 14px; }
+
+.delete-recipe-form { position: absolute; top: 10px; right: 10px; z-index: 5; line-height: 0; }
+.delete-recipe-btn { background-color: rgba(255, 77, 77, 0.7); color: #fff; padding: 0; width: 28px; height: 28px; border-radius: 50%; font-size: 16px; line-height: 28px; text-align: center; box-shadow: none; border: none; transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease; cursor: pointer; }
+.delete-recipe-btn:hover { background-color: #e60000; transform: scale(1.15) rotate(90deg); box-shadow: 0 2px 5px rgba(0,0,0,0.4); }
+
+.no-recipes-item, .no-recipes-message, .no-recipes-message-js { grid-column: 1 / -1; text-align: center; color: #888; font-size: 18px; padding: 60px 20px; }
+
+.comment-avatar .testimonial__img_initials, /* Если используете этот класс */
+.comment-avatar .comment-avatar-initials {  /* Или этот */
+    width: 50px;  /* Размер такой же, как у img в .comment-avatar */
+    height: 50px; /* Размер такой же, как у img в .comment-avatar */
+    border-radius: 50%;
+    background-color: #C99E71; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px; /* Подберите размер шрифта для буквы */
+    font-weight: 600;
+    color: #14110E; 
+    flex-shrink: 0;
+    /* border: 1px solid #C99E71; */ /* Опционально */
+}
+
+.news-wrap {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    padding: 20px 0 70px 0;
+    margin-top: 20px;
+}
+.news-card {
+    background-color: #1C1814;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+}
+.news-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+.news-card__image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+.news-card:hover .news-card__image {
+    transform: scale(1.05);
+}
+.news-card__content {
+    padding: 20px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.news__date {
+    font-size: 0.875em;
+    color: #aaa;
+    margin-bottom: 10px;
+    display: block;
+}
+.news-card__title {
+    font-size: 1.5em;
+    color: #C99E71;
+    margin-bottom: 10px;
+    line-height: 1.3;
+}
+.news-card__text {
+    font-size: 1em;
+    color: #FFFFFF;
+    opacity: 0.8;
+    margin-bottom: 20px;
+    flex-grow: 1;
+    line-height: 1.6;
+}
+.news-card__link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #C99E71;
+    color: #14110E;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    margin-top: auto;
+    align-self: flex-start;
+}
+.news-card__link:hover {
+    background-color: #bd864b;
+    color: #14110E;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
+}
+.news-card__link:active {
+    background-color: #a87a42;
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+.news-card__link:focus {
+     outline: none;
+}
+.news-card__link:focus-visible {
+     outline: none;
+     box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.7);
+}
+.news-card__link .material-icons-outlined {
+    margin-left: 8px;
+    font-size: 1.1em;
+    transition: transform 0.3s ease;
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 1;
+}
+.news-card__link:hover .material-icons-outlined {
+    transform: translateX(4px);
+}
+
+.section-subtitle.news-detail__main-title-override {
+    white-space: normal; 
+    overflow: visible;   
+    text-overflow: clip;            
+    margin-left: auto; 
+    margin-right: auto;
+}
+
+.section-subtitle.news-detail__main-title-override::before,
+.section-subtitle.news-detail__main-title-override::after {
+    background-color: #383838; 
+
+    flex-shrink: 0; 
+    min-width: 50px; 
+}
+
+.news-card_detail {
+    position: relative;
+    background: #1C1814;
+    border-radius: 12px;
+    padding: 40px;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto 50px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    border: 1px solid #333;
+    animation: fadeIn 0.6s ease-out;
+}
+.news-image {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 0 auto 30px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+.news-date {
+    display: block;
+    font-size: 14px;
+    color: #aaa;
+    text-align: center;
+    margin-bottom: 30px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.news-content {
+    font-size: 17px;
+    line-height: 1.8;
+    color: #E0E0E0;
+    margin-bottom: 40px;
+}
+.news-content p { margin-bottom: 1.5em; }
+.news-content strong { font-weight: 700; color: #C99E71; }
+.news-content h2, .news-content h3 { color: #C99E71; margin-top: 1.5em; margin-bottom: 0.8em; font-family: 'Righteous', cursive; font-weight: 600; line-height: 1.3; }
+.news-content h2 { font-size: 1.8em; } .news-content h3 { font-size: 1.5em; }
+.news-content blockquote { margin: 20px 0; padding: 15px 20px 15px 45px; background-color: #221E1A; border-left: 5px solid #C99E71; position: relative; font-style: italic; color: #E0E0E0; border-radius: 0 6px 6px 0; }
+.news-content blockquote::before { content: '\f10d'; font-family: 'Font Awesome 6 Free'; font-weight: 900; position: absolute; left: 15px; top: 10px; font-size: 24px; color: #C99E71; opacity: 0.7; }
+.news-content blockquote p { margin-bottom: 0;}
+.news-content ul, .news-content ol { margin-left: 20px; margin-bottom: 1.5em; padding-left: 20px; }
+.news-content ul li, .news-content ol li { list-style-type: disc; margin-bottom: 0.5em; color: #E0E0E0; }
+.news-content ol li { list-style-type: decimal; }
+.news-content ul li::marker { color: #C99E71; } .news-content ol li::marker { color: #C99E71; }
+
+.news-slider-container {
+    margin-bottom: 30px;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+}
+.news-swiper {
+    width: 100%;
+    height: 450px;
+    border-radius: 8px;
+}
+.swiper-slide {
+    text-align: center;
+    font-size: 18px;
+    background: #1C1814;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+.swiper-slide img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.swiper-button-next, 
+.swiper-button-prev {
+    color: #C99E71 !important;
+}
+.swiper-pagination-bullet-active {
+    background-color: #C99E71 !important;
+}
+
+.video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; background: #000; margin: 30px auto; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+.video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+.share-buttons { margin-top: 30px; margin-bottom: 40px; text-align: center; }
+.share-buttons p { font-size: 16px; color: #C99E71; margin-bottom: 15px; font-weight: 600; }
+.share-button { display: inline-flex; align-items: center; justify-content: center; width: 45px; height: 45px; margin: 0 8px; border-radius: 50%; color: #FFFFFF; font-size: 20px; text-decoration: none; transition: transform 0.2s ease, background-color 0.2s ease; border: 1px solid #444; cursor: pointer; }
+.share-button:hover { transform: scale(1.1); }
+.share-button.vk { background-color: #4a76a8; border-color: #4a76a8;} .share-button.vk:hover { background-color: #5283bb; }
+.share-button.telegram { background-color: #0088cc; border-color: #0088cc;} .share-button.telegram:hover { background-color: #0099e6; }
+.share-button.whatsapp { background-color: #25D366; border-color: #25D366;} .share-button.whatsapp:hover { background-color: #1ebe57; }
+.share-button.copy-link { background-color: #555; border-color: #555;} .share-button.copy-link:hover { background-color: #666; }
+.navigation-buttons { display: flex; justify-content: space-between; align-items: center; margin-top: 40px; gap: 20px; flex-wrap: wrap; }
+.navigation-buttons > .btn-primary, .navigation-buttons > .disabled-nav-button { flex-grow: 0; min-width: 180px; }
+.navigation-buttons .btn-primary { padding: 12px 25px; font-size: 16px; }
+.navigation-buttons .btn-primary .material-icons-outlined { font-size: 20px; vertical-align: middle; line-height: 1; }
+.navigation-buttons .btn-primary.disabled-nav-button { background-color: #7d6a56; color: #3b3128; cursor: not-allowed; opacity: 0.6; }
+.navigation-buttons .btn-primary.disabled-nav-button:hover { background-color: #7d6a56; transform: none; }
+#comments-section { margin-top: 50px; padding-top: 30px; border-top: 1px solid #333; }
+.comments-title { font-size: 24px; color: #C99E71; margin-bottom: 25px; font-family: 'Righteous', cursive; text-align: center; }
+.comment-form { margin-bottom: 40px; text-align: center;}
+.comment-form textarea { width: 100%; min-height: 120px; padding: 15px; border: 1px solid #333; border-radius: 6px; background-color: #1C1814; color: #FFFFFF; font-size: 16px; resize: vertical; margin-bottom: 15px; }
+.comment-form textarea:focus { border-color: #C99E71; outline: none; }
+.comment-form .form-group { margin-bottom: 15px; text-align: left; }
+.comment-form label { display: block; margin-bottom: 8px; color: #aaa; font-size: 14px; }
+.comment-form input[type="text"] { margin-bottom: 0; }
+.comment-form .btn-primary { display: inline-block; margin-top: 15px; float: none; }
+.comment-error { color: #e74c3c; font-size: 14px; margin-bottom: 15px; text-align:left; }
+.comment-list { list-style: none; padding: 0; }
+.comment-item { background-color: #221E1A; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #3a3531; display: flex; gap: 15px; text-align: left;}
+.comment-avatar { width: 50px; height: 50px; border-radius: 50%; overflow: hidden; flex-shrink: 0; }
+.comment-content { flex-grow: 1; }
+.comment-author { font-weight: 600; color: #C99E71; margin-bottom: 5px; font-size: 17px; }
+.comment-date { font-size: 13px; color: #888; margin-bottom: 10px; }
+.comment-text { font-size: 16px; line-height: 1.7; color: #E0E0E0; word-wrap: break-word; }
+.no-comments { text-align: center; color: #aaa; padding: 20px; font-style: italic; }
+
+.toast-success { background-color: #51a351 !important; }
+.toast-error { background-color: #bd362f !important; }
+.toast-info { background-color: #2f96b4 !important; }
+.toast-warning { background-color: #f89406 !important; }
+
+@media (max-width: 992px) {
+    .news-wrap { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+    .news-card_detail { max-width: 90%; padding: 30px; }
+}
+@media (max-width: 768px) {
+    .container { padding: 0 30px; }
+    .section-subtitle { font-size: 28px; padding-top: 60px; }
+    .page-header__back-button-textual { left: 30px; top: 50px; }
+    .recipes-filter-bar { flex-direction: column; align-items: stretch; gap: 10px; }
+    .recipes-search-container, .my-recipes-button-container { width: 100%; }
+    .btn-my-recipes { width: 100%; justify-content: center; }
+    ul.card-list { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
+    ul.card-list section { height: 220px; }
+    ul.card-list .content { padding: 15px; }
+    ul.card-list .content .recipe-content-title { font-size: 20px; }
+    ul.card-list .content p { font-size: 13px; }
+    ul.card-list .content .save-recipe-btn { padding: 8px 15px; font-size: 13px; }
+    .news-content { font-size: 16px; }
+    .navigation-buttons { flex-direction: column; }
+    .navigation-buttons .btn-primary { width: 100%; }
+    .section-subtitle.news-detail__main-title-override { font-size: 28px; }
+    .section-subtitle.news-detail__main-title-override::before,
+    .section-subtitle.news-detail__main-title-override::after { margin: 0 10px; }
+}
+@media (max-width: 480px) {
+    .container { padding: 0 15px; }
+    h2.section-title__h2 { font-size: 20px; }
+    .section-subtitle { font-size: 24px; padding-top: 50px; }
+    .page-header__back-button-textual { left: 15px; top: 40px; }
+    .nav-main__list { flex-direction: column; gap: 15px; }
+    .recipes-filter-bar { margin-bottom: 30px; }
+    ul.card-list { grid-template-columns: 1fr; gap: 20px; }
+    ul.card-list section { height: 200px; }
+    .news-card_detail { padding: 20px; }
+    .news-content { font-size: 15px; }
+    .section-subtitle.news-detail__main-title-override { font-size: 24px; }
+}
