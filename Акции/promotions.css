@@ -1,0 +1,415 @@
+.section-subtitle {
+    font-family: 'Urbanist', Arial, Helvetica, sans-serif;
+    font-size: 32px;
+    line-height: 1.4;
+    font-weight: 600;
+    padding-top: 50px;
+    color: #FFFFFF;
+    text-align: center;
+    margin-bottom: 50px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.section-subtitle::before,
+.section-subtitle::after {
+    content: '';
+    flex-grow: 1;
+    height: 1px;
+    background-color: #444;
+    margin: 0 20px;
+}
+
+.items-container {
+  width: 100%;
+  margin: 0 auto;
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 40px 40px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.item {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+  justify-self: center;
+  height: 425px;
+  border-radius: 5px;
+  box-shadow: 3px 4px 12px 1px rgba(0,0,0,0.4);
+  background-color: #1C1814;
+  color: #E0E0E0;
+}
+
+.item-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 5px;
+}
+
+.content-wrapper {
+  width: 95%;
+  margin: 0 auto;
+  margin-top: 20px;
+  transition: all 0.3s ease-out, filter 0.3s ease-out;
+}
+
+.img-container {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  margin-top: 30px;
+  overflow: hidden; /* Важно для анимации блоба */
+  border-radius: 4px;
+
+}
+
+.promo-icon-img {
+    position: absolute;
+    top: 5px; /* Поднимаем выше */
+    left: 5px; /* Сдвигаем левее */
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    z-index: 3; /* Поверх блоба */
+    border-radius: 50%;
+    background-color: rgba(28, 24, 20, 0.6); /* Немного темнее фон */
+    padding: 5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    pointer-events: none; /* Чтобы не мешала кликам, если перекрывает что-то */
+}
+
+/* Стили для блока с фоновым изображением (блоб) */
+.promo-blob-bg {
+    width: 100%;
+    height: 100%;
+    background-size: cover; /* Заполняет блок */
+    background-position: center center; /* Центрирует фон */
+    background-repeat: no-repeat;
+    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; /* Начальная форма блоба */
+    animation: blob-morph 12s ease-in-out infinite alternate; /* Применяем анимацию */
+    transition: border-radius 0.5s ease; /* Плавный переход */
+    position: relative;
+    z-index: 1; /* Под иконкой */
+    overflow: hidden; /* Обрезаем фон по форме блоба */
+}
+/* Анимация формы блоба */
+@keyframes blob-morph {
+  0% {
+    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+  }
+  25% {
+    border-radius: 57% 43% 37% 63% / 45% 52% 48% 55%;
+  }
+  50% {
+    border-radius: 34% 66% 63% 37% / 62% 61% 39% 38%;
+  }
+  75% {
+      border-radius: 67% 33% 45% 55% / 42% 38% 62% 58%;
+  }
+  100% {
+    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+  }
+}
+
+/* Удаляем стили для .item-img, так как тега больше нет */
+
+.content-text {
+  position: relative;
+  width: 100%;
+  margin-top: 15px;
+  padding-bottom: 55px;
+}
+
+.item-name {
+  font-family: 'Righteous', cursive;
+  font-weight: 400;
+  font-size: 1.5em;
+  text-align: center;
+  color: #FFFFFF;
+  line-height: 1.3;
+  padding: 0 10px;
+}
+
+.item-subtext-container {
+  width: 80%;
+  margin: 0 auto;
+  margin-top: 8px;
+  font-size: 0.8em;
+  letter-spacing: 1px;
+  color: #aaa;
+  text-align: center;
+}
+
+.view-more-btn {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 55px;
+  background: #333;
+  color: #FFFFFF;
+  font-size: 0.9em;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-align: center;
+  line-height: 55px;
+  user-select: none !important;
+  cursor: pointer;
+  z-index: 100;
+  transition: all 0.3s ease-out;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+.view-more-btn:hover {
+    background: #C99E71;
+    color: #14110E;
+}
+.view-symbol {
+    margin-left: 5px;
+    font-weight: bold;
+}
+
+.item-details-container {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 0;
+  background: rgba(28, 24, 20, 0.9);
+  z-index: 99;
+  color: #f1f1f1;
+  transition: all 0.3s ease-out;
+  overflow-y: auto;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+.item-details-container::-webkit-scrollbar {
+  width: 6px;
+}
+.item-details-container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+.item-details-container::-webkit-scrollbar-thumb {
+  background-color: #C99E71;
+  border-radius: 3px;
+}
+
+.details-content-wrapper {
+  position: relative;
+  width: 85%;
+  margin: 0 auto;
+  padding-top: 70px;
+  padding-bottom: 20px;
+}
+
+.detail {
+  margin-top: 10px;
+  line-height: 1.5;
+}
+
+.detail-desc {
+  margin-top: 15px;
+}
+
+.detail-title {
+  font-weight: 700;
+  font-size: 0.9em;
+  color: #C99E71;
+}
+
+.detail-text {
+  font-weight: 400;
+  letter-spacing: 0;
+  font-size: 0.9em;
+  color: #E0E0E0;
+}
+.detail-text.detail-conditions {
+    font-style: italic;
+}
+
+
+.detail-description {
+  width: 100%;
+  padding-left: 0;
+  padding-top: 5px;
+  font-size: 0.9em;
+  font-weight: 400;
+  line-height: 1.6;
+  color: #E0E0E0;
+}
+
+.detail-action-link {
+    display: inline-block;
+    margin-top: 15px;
+    text-decoration: none !important;
+}
+
+.detail-manual-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 15px;
+  border: 1px solid #C99E71;
+  border-radius: 6px;
+  color: #C99E71;
+  font-weight: 600;
+  font-size: 0.85em;
+  cursor: pointer;
+  user-select: none !important;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+.detail-action-link:hover .detail-manual-link {
+    background-color: #C99E71;
+    color: #14110E;
+}
+
+.manual-icon-container {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 8px;
+}
+.manual-icon-container .material-icons-outlined {
+    font-size: 18px;
+}
+
+.manual-svg {
+  width: 15px;
+  height: auto;
+  fill: currentColor;
+}
+
+
+.delivery-container,
+.detail-gallery,
+.detail-price-container,
+input[type="radio"] {
+  display: none !important;
+}
+
+.item.active > .item-wrapper > .content-wrapper {
+  -webkit-filter: blur(4px);
+  filter: blur(4px);
+  transform: scale(1.05);
+  opacity: 0.7;
+  transition: all 0.3s ease-out;
+}
+/* Блоб тоже немного затемняем при активации */
+.item.active .promo-blob-bg {
+    filter: brightness(0.8);
+}
+
+.item.active > .item-wrapper > .view-more-btn {
+  bottom: calc(100% - 55px);
+  transition: all 0.3s ease-out;
+}
+
+.item.active > .item-wrapper > .item-details-container {
+  height: calc(100% - 55px);
+  transition: height 0.3s ease-out;
+}
+
+@media (max-width: 768px) {
+    .items-container {
+        gap: 40px 30px;
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    .item {
+        max-width: 300px;
+        height: 410px;
+    }
+     .item-name {
+        font-size: 1.4em;
+    }
+    .img-container {
+        height: 200px;
+    }
+    .promo-icon-img {
+        width: 45px;
+        height: 45px;
+        top: 4px; /* Корректируем для адаптива */
+        left: 4px;
+    }
+}
+
+
+@media (max-width: 480px) {
+    .section-subtitle {
+        font-size: 28px;
+        margin: 0 10px 40px 10px;
+     }
+     .section-subtitle::before,
+     .section-subtitle::after {
+        margin: 0 10px;
+     }
+    .items-container {
+        grid-template-columns: 1fr;
+        gap: 40px 20px;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    .item {
+        max-width: none;
+        width: 95%;
+        margin: 0 auto;
+        height: 400px;
+    }
+    .img-container {
+        height: 190px;
+        margin-top: 20px;
+    }
+     .promo-icon-img {
+        width: 40px;
+        height: 40px;
+        top: 5px;
+        left: 5px;
+    }
+    .item-name {
+        font-size: 1.3em;
+    }
+    .item-subtext-container {
+        font-size: 0.75em;
+    }
+    .view-more-btn {
+        height: 50px;
+        line-height: 50px;
+        font-size: 0.85em;
+    }
+     .item.active > .item-wrapper > .view-more-btn {
+        bottom: calc(100% - 50px);
+    }
+    .item.active > .item-wrapper > .item-details-container {
+        height: calc(100% - 50px);
+    }
+    .details-content-wrapper {
+        padding-top: 60px;
+        width: 90%;
+    }
+    .detail-title, .detail-text, .detail-description {
+        font-size: 0.85em;
+    }
+    .detail-manual-link {
+        padding: 6px 12px;
+        font-size: 0.8em;
+    }
+    .manual-icon-container .material-icons-outlined {
+        font-size: 16px;
+    }
+}
+
+.no-promotions {
+    grid-column: 1 / -1;
+    text-align: center;
+    font-size: 18px;
+    color: #aaa;
+    padding: 50px 20px;
+    background-color: #1C1814;
+    border-radius: 8px;
+    border: 1px dashed #555;
+    margin-top: 30px;
+}

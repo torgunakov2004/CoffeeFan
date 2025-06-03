@@ -1,0 +1,11 @@
+RewriteEngine On
+
+RewriteCond %{HTTP:X-Forwarded-Proto} !https
+RewriteCond %{HTTPS} off 
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301,NE]
+
+RewriteCond %{HTTP_HOST} ^www\.coffeefan-info\.ru$ [NC]
+RewriteRule ^(.*)$ https://coffeefan-info.ru/$1 [L,R=301,NE]
+
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s(.*)/index\.php [NC]
+RewriteRule ^(.*)index\.php$ /$1 [L,R=301,NE]

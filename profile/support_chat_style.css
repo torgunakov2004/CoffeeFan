@@ -1,0 +1,289 @@
+/* profile/support_chat_style.css */
+
+/* Убираем padding у родителя, если чат должен занимать больше места */
+.profile-page-main-v2.support-chat-page { 
+    padding-top: 20px; /* Оставляем немного отступа сверху от хедера */
+    padding-bottom: 20px; /* И снизу до футера */
+    padding-left: 0;
+    padding-right: 0;
+    display: flex; /* Чтобы контейнер чата мог центрироваться */
+    justify-content: center;
+    align-items: flex-start; /* Если контейнер чата не на всю высоту */
+}
+
+.support-chat-container {
+    width: 100%;
+    max-width: 700px; 
+    /* Высота: (высота экрана - высота хедера - высота футера - отступы main) */
+    /* Примерная высота хедера ~70px, футера ~300-400px (он у вас большой) */
+    /* Пусть будет 65vh, можно подстроить */
+    height: 70vh; 
+    min-height: 450px; /* Минимальная высота, чтобы не слишком сжимался */
+    background-color: #1c1814; 
+    border-radius: 10px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid #2a2520;
+    margin: 0 auto; /* Центрируем контейнер чата */
+}
+
+.chat-header {
+    background-color: #221e1a; 
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #2a2520;
+    flex-shrink: 0; /* Шапка не должна сжиматься */
+}
+
+.support-avatar-chat {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    margin-right: 15px;
+    object-fit: cover;
+    border: 2px solid #C99E71;
+}
+
+.support-info .support-name {
+    display: block;
+    font-weight: 600;
+    color: #e0e0e0;
+    font-size: 1.1em;
+}
+
+.support-info .support-status {
+    font-size: 0.85em;
+    color: #888;
+}
+.support-info .support-status.online {
+    color: #65c765;
+}
+.support-info .support-status.online::before {
+    content: '●';
+    margin-right: 5px;
+    font-size: 0.9em;
+}
+
+.chat-messages {
+    flex-grow: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    scrollbar-width: thin;
+    scrollbar-color: #444 #2a2520;
+}
+.chat-messages::-webkit-scrollbar { width: 6px; }
+.chat-messages::-webkit-scrollbar-track { background: #2a2520; border-radius: 3px; }
+.chat-messages::-webkit-scrollbar-thumb { background-color: #444; border-radius: 3px; }
+
+
+.message {
+    display: flex;
+    align-items: flex-end; 
+    max-width: 80%; 
+    gap: 10px;
+}
+.message-avatar {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    object-fit: cover;
+    align-self: flex-end; 
+    flex-shrink: 0; /* Аватар не должен сжиматься */
+}
+
+.message-content {
+    padding: 10px 15px;
+    border-radius: 18px;
+    line-height: 1.5;
+    font-size: 0.95em;
+    position: relative;
+}
+.message-content p {
+    margin: 0 0 5px 0;
+    word-wrap: break-word; /* Перенос длинных слов */
+    white-space: pre-wrap; /* Сохранение пробелов и переносов строк */
+}
+.message-time {
+    display: block;
+    font-size: 0.75em;
+    color: #777;
+    text-align: right;
+    margin-top: 3px;
+}
+
+.message.user {
+    align-self: flex-end; 
+    flex-direction: row-reverse; 
+}
+.message.user .message-content {
+    background-color: #C99E71;
+    color: #14110E;
+    border-bottom-right-radius: 5px; 
+}
+.message.user .message-time {
+    color: #4a3a2a;
+}
+
+
+.message.support {
+    align-self: flex-start; 
+}
+.message.support .message-content {
+    background-color: #2a2520;
+    color: #d0d0d0;
+    border-bottom-left-radius: 5px; 
+}
+.message.support .message-time {
+    color: #666;
+}
+
+/* Стили для индикатора печати */
+.message.typing-indicator .message-content {
+    background-color: transparent; 
+    box-shadow: none; 
+    padding: 5px 10px; /* Уменьшаем отступы для компактности */
+}
+.message.typing-indicator .message-content p {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0; /* Убираем нижний отступ у параграфа с точками */
+}
+.message.typing-indicator .dot {
+    display: inline-block;
+    width: 7px; /* Чуть меньше */
+    height: 7px; /* Чуть меньше */
+    background-color: #999; 
+    border-radius: 50%;
+    margin: 0 2px;
+    animation: typing-dots 1.3s infinite ease-in-out;
+}
+.message.typing-indicator .dot:nth-child(1) { animation-delay: 0s; }
+.message.typing-indicator .dot:nth-child(2) { animation-delay: 0.25s; }
+.message.typing-indicator .dot:nth-child(3) { animation-delay: 0.5s; }
+
+@keyframes typing-dots {
+    0%, 60%, 100% { transform: translateY(0px) scale(0.6); opacity: 0.4; }
+    30% { transform: translateY(-2px) scale(1); opacity: 1; }
+}
+
+
+.chat-input-area {
+    display: flex;
+    align-items: flex-end; 
+    padding: 12px 15px; /* Уменьшил отступы */
+    border-top: 1px solid #2a2520;
+    background-color: #221e1a;
+    flex-shrink: 0; /* Поле ввода не должно сжиматься */
+}
+
+.chat-input-area textarea {
+    flex-grow: 1;
+    padding: 10px 15px;
+    border: 1px solid #3a332d;
+    border-radius: 20px;
+    background-color: #14110E;
+    color: #e0e0e0;
+    font-size: 1em;
+    resize: none; 
+    min-height: 42px; 
+    max-height: 100px; /* Уменьшил немного максимальную высоту */
+    overflow-y: auto;
+    line-height: 1.4;
+    margin-right: 10px;
+    scrollbar-width: thin;
+    scrollbar-color: #444 #14110E;
+}
+.chat-input-area textarea::-webkit-scrollbar { width: 5px; }
+.chat-input-area textarea::-webkit-scrollbar-thumb { background-color: #444; border-radius: 3px; }
+
+
+.chat-input-area textarea:focus {
+    outline: none;
+    border-color: #C99E71;
+    box-shadow: 0 0 0 2px rgba(201, 158, 113, 0.2);
+}
+
+.chat-input-area button {
+    background-color: #C99E71;
+    color: #14110E;
+    border: none;
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    flex-shrink: 0; 
+}
+.chat-input-area button:hover {
+    background-color: #bd864b;
+}
+.chat-input-area button .material-icons-outlined {
+    font-size: 24px;
+}
+
+.chat-contact-info {
+    background-color: #1a1714;
+    padding: 10px 15px; /* Уменьшил отступы */
+    border-top: 1px solid #2a2520;
+    font-size: 0.8em; /* Уменьшил шрифт */
+    color: #888;
+    text-align: center;
+    flex-shrink: 0; /* Блок с контактами не должен сжиматься */
+}
+.chat-contact-info p {
+    margin: 4px 0; /* Уменьшил отступы */
+}
+.chat-contact-info a {
+    color: #C99E71;
+    text-decoration: none;
+}
+.chat-contact-info a:hover {
+    text-decoration: underline;
+}
+.chat-contact-info i {
+    margin-right: 5px;
+    color: #C99E71;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .profile-page-main-v2.support-chat-page {
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+    .support-chat-container {
+        margin: 0 5px 5px 5px; /* Уменьшил отступы для мобильных */
+        height: calc(100vh - 100px); /* Подстроить под высоту хедера/футера на мобильных */
+        min-height: 400px;
+        border-radius: 8px; /* Можно оставить небольшое скругление */
+    }
+     .chat-header { padding: 10px 12px; }
+     .support-avatar-chat { width: 35px; height: 35px; margin-right: 8px;}
+     .support-info .support-name { font-size: 1em; }
+     .chat-messages { padding: 12px; gap: 12px;}
+     .message-avatar { width: 28px; height: 28px; }
+     .message-content { padding: 7px 10px; font-size: 0.9em; }
+     .chat-input-area { padding: 8px 10px; }
+     .chat-input-area textarea { padding: 7px 12px; min-height: 38px; max-height: 80px; }
+     .chat-input-area button { width: 38px; height: 38px; }
+     .chat-input-area button .material-icons-outlined { font-size: 22px; }
+     .chat-contact-info { font-size: 0.75em; padding: 8px 10px;}
+}
+
+@media (max-width: 480px) {
+     .message { max-width: 90%; }
+     .support-chat-container {
+        margin: 0;
+        border-radius: 0;
+        height: calc(100vh - (var(--header-height-mobile, 60px) + var(--footer-height-mobile, 50px))); /* Попытка использовать CSS переменные, если они есть */
+     }
+}

@@ -1,0 +1,197 @@
+
+
+.profile-card.orders-card-override .profile-card-header.orders-card-header-override {
+    padding: 25px 30px;
+    justify-content: center;
+    text-align: center;
+    border-bottom: 1px solid #332c25;
+}
+
+.profile-card.orders-card-override .profile-card-header .profile-card-name {
+    font-size: 26px;
+    color: #C99E71;
+}
+
+.profile-card.orders-card-override .profile-card-content.orders-card-content-override {
+    padding: 25px 30px;
+}
+
+.orders-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.order-card {
+    background-color: #181512;
+    border-radius: 8px;
+    border: 1px solid #383028;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+.order-card-header {
+    background-color: #201c18;
+    padding: 12px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #383028;
+    flex-wrap: wrap;
+    gap: 8px 15px;
+}
+
+.order-id {
+    font-size: 1.05em;
+    font-weight: 600;
+    color: #C99E71;
+}
+
+.order-date {
+    font-size: 0.85em;
+    color: #999;
+}
+
+.order-status {
+    font-size: 0.85em;
+    font-weight: 500;
+    padding: 4px 8px;
+    border-radius: 4px;
+    color: #fff;
+    white-space: nowrap;
+}
+.status-pending { background-color: #c79242; }
+.status-processing { background-color: #4a9fc1; }
+.status-shipped { background-color: #2f6a99; }
+.status-delivered, .status-completed { background-color: #53a553; }
+.status-cancelled { background-color: #c94c49; }
+
+.order-card-body {
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.order-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #26221e;
+}
+.order-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.order-item-image {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid #302b27;
+}
+
+.order-item-details {
+    flex-grow: 1;
+}
+
+.order-item-title {
+    font-size: 0.95em;
+    font-weight: 500;
+    color: #dadada;
+    margin: 0 0 4px 0;
+}
+
+.order-item-price-qty {
+    font-size: 0.8em;
+    color: #909090;
+    margin: 0;
+}
+
+.order-item-subtotal {
+    font-size: 0.95em;
+    font-weight: 600;
+    color: #f0f0f0;
+    margin-left: auto;
+    white-space: nowrap;
+}
+
+.order-card-footer {
+    background-color: #201c18;
+    padding: 12px 18px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+    border-top: 1px solid #383028;
+}
+
+.order-total-label {
+    font-size: 1em;
+    color: #999;
+}
+
+.order-total-amount {
+    font-size: 1.1em;
+    font-weight: 700;
+    color: #C99E71;
+}
+
+.no-orders-message {
+    text-align: center;
+    padding: 40px 20px;
+    color: #a0a0a0;
+    background-color: #181512;
+    border-radius: 8px;
+    margin-top: 20px;
+}
+.no-orders-icon {
+    font-size: 50px;
+    color: #403b36;
+    margin-bottom: 15px;
+    display: block;
+}
+.no-orders-message p {
+    font-size: 1.1em;
+    margin-bottom: 20px;
+}
+.no-orders-message .btn-primary-v2 {
+    padding: 10px 25px;
+}
+
+@media (max-width: 768px) {
+    .profile-card.orders-card-override .profile-card-header.orders-card-header-override {
+        padding: 20px;
+    }
+     .profile-card.orders-card-override .profile-card-header .profile-card-name {
+        font-size: 24px;
+    }
+    .profile-card.orders-card-override .profile-card-content.orders-card-content-override {
+        padding: 20px;
+    }
+}
+@media (max-width: 576px) {
+    .order-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .order-status {
+        align-self: flex-start;
+        margin-top: 5px;
+    }
+    .order-item {
+        align-items: flex-start;
+        gap: 10px;
+    }
+    .order-item-image {
+        width: 45px;
+        height: 45px;
+    }
+    .order-item-subtotal {
+        margin-left: 0;
+        align-self: flex-end;
+        margin-top: 5px;
+    }
+}

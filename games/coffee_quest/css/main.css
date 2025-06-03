@@ -1,0 +1,211 @@
+* {
+	margin: 0;
+	padding: 0;
+	border: 0;
+    box-sizing: border-box; /* Применим box-sizing глобально */
+}
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden; 
+}
+body {
+	background-color: #14110E;
+	font-family: "Urbanist", "Lucida Grande", Calibri, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+/* div - уже есть box-sizing:border-box; через * {} */
+a {
+	color: #C99E71;
+	text-decoration: none;
+    font-weight: bold;
+}
+a:hover {
+    color: #FFFFFF;
+}
+#container {
+	position: relative; 
+	margin: 0; 
+	width: 504px; /* Фиксированная ширина игры */
+	padding: 0; /* Убедимся, что нет внутренних отступов */
+    border: 3px solid #C99E71;
+    box-shadow: 0 0 15px rgba(201, 158, 113, 0.3);
+    background-color: #0d0b09; 
+    overflow: hidden; /* Добавим, чтобы обрезать все, что может вылезти за пределы */
+}
+#coffee { 
+    width: 100%; /* Явно зададим ширину, чтобы Phaser ориентировался */
+    height: 504px; /* Такая же, как у контейнера, если игра квадратная */
+                 /* Если #status и #messages внутри #coffee, то это неверно */
+                 /* Если #coffee - это только область для Phaser canvas, то ее высота должна быть container.height - status.height - messages.height */
+                 /* Судя по JS, Phaser рендерится в div с id="coffee", который не должен включать status и messages */
+    /* Предположим, Phaser создает свой canvas внутри #coffee */
+}
+#status {
+	background-color:#1C1814;
+	height:64px;
+	color:#FFFFFF;
+	width: 100%; 
+    border-bottom: 2px solid #3a3531;
+    position: relative; 
+    z-index: 10;
+    /* box-sizing: border-box; уже есть через * */
+}
+#status ul {
+    display: flex; 
+    justify-content: space-around;
+    align-items: center;
+    height: 100%;
+    padding: 0 5px; 
+}
+#status li {
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1; 
+}
+#status span { 
+	font-size:18px;
+    font-weight: 600;
+    color: #C99E71;
+    margin-left: 5px; 
+}
+#status .icon {
+	width:36px; 
+	height:36px;
+	padding:0;
+    margin-right: 5px;
+}
+#messages {
+	display: block;
+	width: 100%; 
+	height: 100px; 
+	background-color:rgba(13, 11, 9, 0.9); 
+	overflow-y: auto; 
+    overflow-x: hidden; 
+	color:#e0e0e0;
+	padding:8px 10px;
+	font-size:12px; 
+    line-height: 1.4;
+    border-top: 1px solid #3a3531;
+    position: relative; 
+    z-index: 9;
+    /* box-sizing: border-box; уже есть через * */
+}
+#messages::-webkit-scrollbar { width: 5px; }
+#messages::-webkit-scrollbar-track { background: #2a2523; border-radius:3px;}
+#messages::-webkit-scrollbar-thumb { background-color: #C99E71; border-radius: 3px;}
+#messages li { 
+	list-style:none;
+	height:auto;
+    padding: 3px 0;
+    border-bottom: 1px dotted #443e3a; 
+}
+#messages li:last-child {
+    border-bottom: none;
+}
+#messages span { 
+	width:auto; 
+	color:#C99E71; 
+	font-size:13px;
+	font-weight: bold;
+	display:inline-block;
+	padding-right:6px;
+	text-align:left;
+	margin-top: 0;
+    float: none;
+}
+.error {
+	color:#e74c3c !important; 
+    font-weight: bold;
+}
+.indicator {
+	margin:-48px 0 0 58px; 
+	position:absolute;
+    font-weight: bold;
+    font-size: 18px;
+    text-shadow: 1px 1px 2px #000;
+    z-index: 20; 
+}
+.level { 
+    display: inline-block;
+	padding:0;
+    margin-right: 8px;
+	color:#a0a0a0;
+	font-size:14px;
+    line-height: normal; 
+}
+#status li:last-child div.level { 
+     margin-left: auto; 
+     margin-right: 5px;
+}
+#status li:last-child span#levelValue { 
+    position: static;
+    margin-top: 0;
+    margin-left: 0; 
+    font-size: 18px;
+    color: #C99E71;
+}
+.doubleSize {
+	-ms-transform: scale(2.2);
+    -webkit-transform: scale(2.2);
+    transform: scale(2.2);
+    margin-top:-110px; 
+    -webkit-transition: margin 0.8s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+    transition: margin 0.8s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+	text-shadow: 2px 3px 8px rgba(0,0,0,0.7);
+	opacity:0;
+}
+.pos { color:#2ecc71!important; } 
+.neg { color:#e74c3c!important; } 
+#gameOver {
+	position:absolute;
+    top: 0; left: 0;
+	width:100%;
+	height:100%;
+	background-color:rgba(20, 17, 14, 0.95);
+	padding-top:20%; 
+	font-size:24px; 
+    font-family: 'Righteous', cursive;
+	text-align:center;
+    z-index: 100;
+    color: #FFFFFF;
+    display: none; 
+    flex-direction: column; 
+    justify-content: center;
+    align-items: center;
+}
+#gameOver h1 {
+	line-height:60px; 
+	font-size: 70px; 
+    color: #C99E71;
+    margin-bottom: 15px;
+}
+#gameOver span#scoreValue { 
+	font-size: 42px;
+    color: #FFFFFF;
+    display: block; 
+    margin: 5px 0;
+}
+#gameOver a {
+    display: inline-block;
+    margin-top: 25px;
+    padding: 12px 30px;
+    background-color: #C99E71;
+    color: #14110E;
+    border-radius: 6px;
+    font-size: 18px;
+    font-family: 'Urbanist', sans-serif;
+    font-weight: bold;
+}
+#gameOver a:hover {
+    background-color: #bd864b;
+}
+
+/* Стили для Phaser canvas, если он генерируется напрямую в #coffee */
+#coffee canvas {
+    display: block; /* Убирает лишние отступы под canvas */
+}
